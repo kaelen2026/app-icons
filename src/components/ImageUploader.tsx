@@ -21,7 +21,7 @@ export default function ImageUploader({ imageSrc, onImageChange }: Props) {
   function handleFile(file: File | undefined) {
     if (!file) return;
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      setError("Unsupported file type. Use PNG, JPG, WebP or SVG.");
+      setError("unsupported type. use png / jpg / webp / svg.");
       return;
     }
     setError(null);
@@ -37,10 +37,7 @@ export default function ImageUploader({ imageSrc, onImageChange }: Props) {
   }
 
   return (
-    <section className="space-y-2">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-        Image
-      </h2>
+    <div className="space-y-2">
       <input
         ref={inputRef}
         type="file"
@@ -49,7 +46,7 @@ export default function ImageUploader({ imageSrc, onImageChange }: Props) {
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
       <div
-        className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-600 px-4 py-6 text-center transition-colors hover:border-zinc-400 hover:bg-zinc-800/50"
+        className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-hairline px-4 py-6 text-center transition-colors hover:border-hairline-bright hover:bg-panel-2"
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
@@ -57,21 +54,23 @@ export default function ImageUploader({ imageSrc, onImageChange }: Props) {
           handleFile(e.dataTransfer.files?.[0]);
         }}
       >
-        <span className="text-sm text-zinc-300">
-          {imageSrc ? "Replace image" : "Click or drop an image"}
+        <span className="text-xs text-text">
+          {imageSrc ? "replace image" : "click or drop an image"}
         </span>
-        <span className="text-xs text-zinc-500">PNG · JPG · WebP · SVG</span>
+        <span className="text-[10px] text-text-faint">
+          png · jpg · webp · svg
+        </span>
       </div>
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-[11px] text-red-400">{error}</p>}
       {imageSrc && (
         <button
           type="button"
           onClick={handleRemove}
-          className="w-full rounded-md border border-zinc-700 px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-red-500/60 hover:text-red-400"
+          className="w-full rounded-sm border border-hairline px-3 py-1.5 text-[11px] text-text-dim transition-all hover:border-red-500/50 hover:text-red-400 active:scale-[0.97]"
         >
-          Remove image
+          remove image
         </button>
       )}
-    </section>
+    </div>
   );
 }

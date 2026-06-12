@@ -1,61 +1,159 @@
 "use client";
 
-import { useState } from "react";
-import { exportFileList, exportPresets } from "@/lib/exportPresets";
+import type { PlatformId } from "@/lib/exportPresets";
+import {
+  exportFileList,
+  extraExportFiles,
+  platforms,
+  sizeForPath,
+} from "@/lib/exportPresets";
 
 type Props = {
   exporting: boolean;
+  completed: string[];
+  saved: boolean;
+  selected: PlatformId[];
+  onToggle: (id: PlatformId) => void;
   onDownload: () => void;
 };
 
-export default function ExportPanel({ exporting, onDownload }: Props) {
-  const [showFiles, setShowFiles] = useState(false);
+function FileRow({
+  path,
+  label,
+  done,
+}: {
+  path: string;
+  label: string;
+  done: boolean;
+}) {
+  const size = sizeForPath(path);
+  return (
+    <li className="flex items-center gap-2">
+      <span
+        className={`w-3 text-center transition-colors duration-150 ${
+          done ? "text-accent" : "text-text-faint"
+        }`}
+      >
+        {done ? "✓" : "·"}
+      </span>
+      <span
+        className={`min-w-0 flex-1 truncate transition-colors duration-150 ${
+          done ? "text-text" : "text-text-dim"
+        }`}
+      >
+        {label}
+      </span>
+      {size !== null && (
+        <span className="tabular-nums text-text-faint">{size}</span>
+      )}
+    </li>
+  );
+}
+
+export default function ExportPanel({
+  exporting,
+  completed,
+  saved,
+  selected,
+  onToggle,
+  onDownload,
+}: Props) {
+  const fileList = exportFileList(selected);
+  const none = selected.length === 0;
 
   return (
-    <section className="space-y-3">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-        Export
+    <section className="space-y-4">
+      <h2 className="text-[11px] tracking-[0.18em] text-text-faint">
+        platforms
       </h2>
-      <p className="text-xs text-zinc-500">
-        Expo + Web/PWA icon pack as <code>app-icons.zip</code>
+      <ul className="space-y-1.5">
+        {platforms.map((platform) => {
+          const checked = selected.includes(platform.id);
+          const count =
+            platform.files.length + (platform.staticFiles?.length ?? 0);
+          return (
+            <li key={platform.id}>
+              <label className="flex cursor-pointer items-baseline gap-2 text-[11px]">
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  disabled={exporting}
+                  onChange={() => onToggle(platform.id)}
+                  className="relative top-px size-3 accent-[var(--color-accent,#4ade80)]"
+                />
+                <span className={checked ? "text-text" : "text-text-dim"}>
+                  {platform.label}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-text-faint">
+                  {platform.description}
+                </span>
+                <span className="tabular-nums text-text-faint">{count}</span>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+
+      <h2 className="border-t border-hairline pt-3 text-[11px] tracking-[0.18em] text-text-faint">
+        manifest
+      </h2>
+      <div className="space-y-2 text-[11px]">
+        {platforms
+          .filter((p) => selected.includes(p.id))
+          .map((platform) => {
+            const paths = [
+              ...platform.files.map((f) => f.path),
+              ...(platform.staticFiles ?? []).map((f) => f.path),
+            ];
+            return (
+              <div key={platform.id}>
+                <p className="pb-0.5 text-text-faint">{platform.id}/</p>
+                <ul className="space-y-0.5">
+                  {paths.map((path) => (
+                    <FileRow
+                      key={path}
+                      path={path}
+                      label={path.slice(platform.id.length + 1)}
+                      done={completed.includes(path)}
+                    />
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        {!none && (
+          <ul className="space-y-0.5">
+            {extraExportFiles.map((path) => (
+              <FileRow
+                key={path}
+                path={path}
+                label={path}
+                done={completed.includes(path)}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <p className="border-t border-hairline pt-3 text-[11px] text-text-faint">
+        {saved ? (
+          <span className="text-accent">app-icons.zip ✓ saved</span>
+        ) : exporting ? (
+          `rendering ${completed.length}/${fileList.length}…`
+        ) : none ? (
+          "no platforms selected"
+        ) : (
+          `${fileList.length} files · ${selected.join(" + ")}`
+        )}
       </p>
       <button
         type="button"
         onClick={onDownload}
-        disabled={exporting}
-        className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+        disabled={exporting || none}
+        className="w-full rounded-sm bg-accent px-4 py-2 text-xs font-medium text-ink transition-all hover:brightness-110 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {exporting ? "Generating…" : "Download ZIP"}
+        {exporting ? "rendering…" : "download .zip"}
       </button>
-      <button
-        type="button"
-        onClick={() => setShowFiles((v) => !v)}
-        className="w-full rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 transition-colors hover:border-zinc-500"
-      >
-        {showFiles ? "Hide file list" : "File list"}
-      </button>
-      {showFiles && (
-        <div className="space-y-1 rounded-lg border border-zinc-800 bg-zinc-900 p-3">
-          <ul className="space-y-0.5 font-mono text-[11px] text-zinc-400">
-            {exportFileList.map((path) => {
-              const preset = exportPresets.find((p) => p.path === path);
-              return (
-                <li key={path} className="flex justify-between gap-2">
-                  <span>{path}</span>
-                  {preset && (
-                    <span className="text-zinc-600">
-                      {preset.size}×{preset.size}
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          <p className="pt-1 text-[11px] text-zinc-500">
-            {exportFileList.length} files total
-          </p>
-        </div>
-      )}
     </section>
   );
 }

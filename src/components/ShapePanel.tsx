@@ -3,10 +3,10 @@
 import type { IconConfig, IconShape } from "@/types/icon";
 
 const SHAPES: { value: IconShape; label: string; radiusClass: string }[] = [
-  { value: "square", label: "Square", radiusClass: "rounded-sm" },
-  { value: "rounded", label: "Rounded", radiusClass: "rounded-lg" },
-  { value: "circle", label: "Circle", radiusClass: "rounded-full" },
-  { value: "squircle", label: "Squircle", radiusClass: "rounded-[38%]" },
+  { value: "square", label: "square", radiusClass: "rounded-none" },
+  { value: "rounded", label: "rounded", radiusClass: "rounded-md" },
+  { value: "circle", label: "circle", radiusClass: "rounded-full" },
+  { value: "squircle", label: "squircle", radiusClass: "rounded-[38%]" },
 ];
 
 type Props = {
@@ -17,29 +17,38 @@ type Props = {
 export default function ShapePanel({ config, onChange }: Props) {
   return (
     <section className="space-y-3">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-        Shape
-      </h2>
-      <div className="grid grid-cols-4 gap-2">
-        {SHAPES.map((shape) => (
-          <button
-            key={shape.value}
-            type="button"
-            onClick={() => onChange({ shape: shape.value })}
-            className={`flex flex-col items-center gap-1.5 rounded-lg border p-2 transition-colors ${
-              config.shape === shape.value
-                ? "border-indigo-500 bg-indigo-500/10"
-                : "border-zinc-700 hover:border-zinc-500"
-            }`}
-            title={shape.label}
-          >
-            <span
-              className={`h-7 w-7 bg-zinc-400 ${shape.radiusClass}`}
-              aria-hidden
-            />
-            <span className="text-[10px] text-zinc-400">{shape.label}</span>
-          </button>
-        ))}
+      <h2 className="text-[11px] tracking-[0.18em] text-text-faint">shape</h2>
+      <div className="grid grid-cols-4 gap-1.5">
+        {SHAPES.map((shape) => {
+          const active = config.shape === shape.value;
+          return (
+            <button
+              key={shape.value}
+              type="button"
+              onClick={() => onChange({ shape: shape.value })}
+              className={`flex flex-col items-center gap-1.5 rounded-sm border p-2 transition-colors ${
+                active
+                  ? "border-accent bg-accent-dim"
+                  : "border-hairline hover:border-hairline-bright"
+              }`}
+              title={shape.label}
+            >
+              <span
+                className={`h-6 w-6 ${shape.radiusClass} ${
+                  active ? "bg-accent" : "bg-text-faint"
+                }`}
+                aria-hidden
+              />
+              <span
+                className={`text-[9px] ${
+                  active ? "text-accent" : "text-text-faint"
+                }`}
+              >
+                {shape.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </section>
   );

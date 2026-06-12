@@ -1,6 +1,45 @@
 import type { IconConfig, IconShape, TextFont } from "@/types/icon";
 import { lucideSvgDataUrl } from "./lucide";
 
+export type RenderVariant =
+  | "masked" // shape clip + background + foreground (preview / default)
+  | "fullBleed" // square, no clip — for targets that apply their own mask (iOS, Play Store)
+  | "adaptiveForeground" // transparent bg, foreground in the Android 66/108dp safe zone
+  | "adaptiveBackground" // background layer only, full bleed
+  | "maskable" // full bleed, foreground in the PWA 80% safe zone
+  | "harmonyForeground"; // transparent bg, foreground in the HarmonyOS 672/1024px safe zone
+
+type VariantSpec = {
+  clip: boolean;
+  background: boolean;
+  foreground: boolean;
+  fgScale: number;
+};
+
+const VARIANTS: Record<RenderVariant, VariantSpec> = {
+  masked: { clip: true, background: true, foreground: true, fgScale: 1 },
+  fullBleed: { clip: false, background: true, foreground: true, fgScale: 1 },
+  adaptiveForeground: {
+    clip: false,
+    background: false,
+    foreground: true,
+    fgScale: 66 / 108,
+  },
+  adaptiveBackground: {
+    clip: false,
+    background: true,
+    foreground: false,
+    fgScale: 1,
+  },
+  maskable: { clip: false, background: true, foreground: true, fgScale: 0.8 },
+  harmonyForeground: {
+    clip: false,
+    background: false,
+    foreground: true,
+    fgScale: 672 / 1024,
+  },
+};
+
 const imageCache = new Map<string, HTMLImageElement>();
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -180,27 +219,59 @@ async function drawForeground(
 export async function drawIcon(
   ctx: CanvasRenderingContext2D,
   config: IconConfig,
-  size: number
+  size: number,
+  variant: RenderVariant = "masked"
 ): Promise<void> {
+  const spec = VARIANTS[variant];
   ctx.clearRect(0, 0, size, size);
   ctx.save();
-  traceShapePath(ctx, config.shape, size);
-  ctx.clip();
-  drawBackground(ctx, config, size);
-  await drawForeground(ctx, config, size);
+  if (spec.clip) {
+    traceShapePath(ctx, config.shape, size);
+    ctx.clip();
+  }
+  if (spec.background) drawBackground(ctx, config, size);
+  if (spec.foreground) {
+    // Shrink scale AND offsets so the composition stays inside the safe zone
+    const fgConfig: IconConfig =
+      spec.fgScale === 1
+        ? config
+        : {
+            ...config,
+            scale: config.scale * spec.fgScale,
+            offsetX: config.offsetX * spec.fgScale,
+            offsetY: config.offsetY * spec.fgScale,
+          };
+    await drawForeground(ctx, fgConfig, size);
+  }
   ctx.restore();
+}
+
+/** Small renders for the context preview wall (returns a data URL for <img>). */
+export async function renderIconDataUrl(
+  config: IconConfig,
+  size: number,
+  variant: RenderVariant = "masked"
+): Promise<string> {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D context unavailable");
+  await drawIcon(ctx, config, size, variant);
+  return canvas.toDataURL("image/png");
 }
 
 export async function renderIcon(
   config: IconConfig,
-  size: number
+  size: number,
+  variant: RenderVariant = "masked"
 ): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D context unavailable");
-  await drawIcon(ctx, config, size);
+  await drawIcon(ctx, config, size, variant);
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (blob) resolve(blob);

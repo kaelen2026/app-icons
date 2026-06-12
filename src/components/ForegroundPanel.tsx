@@ -6,15 +6,15 @@ import { lucideIconNames, lucideSvgDataUrl, toKebab } from "@/lib/lucide";
 import ImageUploader from "./ImageUploader";
 
 const MODES: { value: ForegroundMode; label: string }[] = [
-  { value: "image", label: "Image" },
-  { value: "text", label: "Text" },
-  { value: "icon", label: "Icon" },
+  { value: "image", label: "image" },
+  { value: "text", label: "text" },
+  { value: "icon", label: "icon" },
 ];
 
 const FONTS: { value: TextFont; label: string }[] = [
-  { value: "sans", label: "Sans" },
-  { value: "serif", label: "Serif" },
-  { value: "mono", label: "Mono" },
+  { value: "sans", label: "sans" },
+  { value: "serif", label: "serif" },
+  { value: "mono", label: "mono" },
 ];
 
 const POPULAR_ICONS = [
@@ -64,24 +64,27 @@ export default function ForegroundPanel({ config, onChange }: Props) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-        Foreground
+      <h2 className="text-[11px] tracking-[0.18em] text-text-faint">
+        fg_mode
       </h2>
-      <div className="grid grid-cols-3 gap-1 rounded-lg bg-zinc-800 p-1">
-        {MODES.map((mode) => (
-          <button
-            key={mode.value}
-            type="button"
-            onClick={() => onChange({ fgMode: mode.value })}
-            className={`rounded-md px-3 py-1.5 text-xs transition-colors ${
-              config.fgMode === mode.value
-                ? "bg-zinc-600 text-white"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            {mode.label}
-          </button>
-        ))}
+      <div className="grid grid-cols-3 gap-px border border-hairline bg-hairline">
+        {MODES.map((mode) => {
+          const active = config.fgMode === mode.value;
+          return (
+            <button
+              key={mode.value}
+              type="button"
+              onClick={() => onChange({ fgMode: mode.value })}
+              className={`px-3 py-1.5 text-[11px] transition-colors ${
+                active
+                  ? "bg-panel-2 text-accent"
+                  : "bg-ink text-text-dim hover:text-text"
+              }`}
+            >
+              {active ? `> ${mode.label}` : mode.label}
+            </button>
+          );
+        })}
       </div>
 
       {config.fgMode === "image" && (
@@ -99,28 +102,28 @@ export default function ForegroundPanel({ config, onChange }: Props) {
             maxLength={12}
             onChange={(e) => onChange({ text: e.target.value })}
             placeholder="A"
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm outline-none transition-colors focus:border-indigo-500"
+            className="w-full rounded-sm border border-hairline bg-panel-2 px-3 py-2 text-sm text-text outline-none transition-colors focus:border-accent"
           />
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-xs text-zinc-300">
+            <label className="flex items-center gap-2 text-[11px] text-text-dim">
               <input
                 type="color"
                 value={config.textColor}
                 onChange={(e) => onChange({ textColor: e.target.value })}
-                className="h-8 w-8 cursor-pointer rounded border border-zinc-700 bg-transparent"
+                className="h-7 w-7"
               />
-              Color
+              color
             </label>
-            <div className="grid flex-1 grid-cols-3 gap-1 rounded-lg bg-zinc-800 p-1">
+            <div className="grid flex-1 grid-cols-3 gap-px border border-hairline bg-hairline">
               {FONTS.map((font) => (
                 <button
                   key={font.value}
                   type="button"
                   onClick={() => onChange({ textFont: font.value })}
-                  className={`rounded-md px-2 py-1 text-xs transition-colors ${
+                  className={`px-2 py-1 text-[11px] transition-colors ${
                     config.textFont === font.value
-                      ? "bg-zinc-600 text-white"
-                      : "text-zinc-400 hover:text-zinc-200"
+                      ? "bg-panel-2 text-accent"
+                      : "bg-ink text-text-dim hover:text-text"
                   }`}
                 >
                   {font.label}
@@ -138,46 +141,47 @@ export default function ForegroundPanel({ config, onChange }: Props) {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search 1900+ icons…"
-              className="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm outline-none transition-colors focus:border-indigo-500"
+              placeholder="search 1900+ icons…"
+              className="min-w-0 flex-1 rounded-sm border border-hairline bg-panel-2 px-3 py-2 text-xs text-text outline-none transition-colors focus:border-accent"
             />
-            <label className="flex items-center gap-2 text-xs text-zinc-300">
-              <input
-                type="color"
-                value={config.iconColor}
-                onChange={(e) => onChange({ iconColor: e.target.value })}
-                className="h-8 w-8 cursor-pointer rounded border border-zinc-700 bg-transparent"
-              />
-            </label>
+            <input
+              type="color"
+              value={config.iconColor}
+              onChange={(e) => onChange({ iconColor: e.target.value })}
+              className="h-7 w-7 shrink-0"
+            />
           </div>
           {visibleIcons.length === 0 ? (
-            <p className="text-xs text-zinc-500">No icons match “{query}”.</p>
+            <p className="text-[11px] text-text-faint">
+              no icons match “{query}”
+            </p>
           ) : (
-            <div className="grid grid-cols-6 gap-1.5">
+            <div className="grid grid-cols-6 gap-1">
               {visibleIcons.map((name) => {
-                const src = lucideSvgDataUrl(name, "#d4d4d8");
+                const src = lucideSvgDataUrl(name, "#9d9da6");
                 if (!src) return null;
+                const active = config.iconName === name;
                 return (
                   <button
                     key={name}
                     type="button"
                     onClick={() => onChange({ iconName: name })}
                     title={toKebab(name)}
-                    className={`flex aspect-square items-center justify-center rounded-md border p-1.5 transition-colors ${
-                      config.iconName === name
-                        ? "border-indigo-500 bg-indigo-500/10"
-                        : "border-zinc-800 hover:border-zinc-600"
+                    className={`flex aspect-square items-center justify-center rounded-sm border p-1.5 transition-colors ${
+                      active
+                        ? "border-accent bg-accent-dim"
+                        : "border-hairline hover:border-hairline-bright"
                     }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt={toKebab(name)} className="h-5 w-5" />
+                    <img src={src} alt={toKebab(name)} className="h-4.5 w-4.5" />
                   </button>
                 );
               })}
             </div>
           )}
-          <p className="text-[11px] text-zinc-500">
-            Selected: <span className="text-zinc-300">{toKebab(config.iconName)}</span>
+          <p className="text-[10px] text-text-faint">
+            selected: <span className="text-accent">{toKebab(config.iconName)}</span>
           </p>
         </div>
       )}
