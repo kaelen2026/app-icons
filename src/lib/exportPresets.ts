@@ -82,6 +82,20 @@ const iosContentsJson = JSON.stringify(
         platform: "ios",
         size: "1024x1024",
       },
+      {
+        appearances: [{ appearance: "luminosity", value: "dark" }],
+        filename: "icon-1024-dark.png",
+        idiom: "universal",
+        platform: "ios",
+        size: "1024x1024",
+      },
+      {
+        appearances: [{ appearance: "luminosity", value: "tinted" }],
+        filename: "icon-1024-tinted.png",
+        idiom: "universal",
+        platform: "ios",
+        size: "1024x1024",
+      },
     ],
     info: { author: "xcode", version: 1 },
   },
@@ -150,12 +164,22 @@ export const platforms: Platform[] = [
   {
     id: "ios",
     label: "iOS",
-    description: "Xcode 14+ single-size asset catalog",
+    description: "Xcode asset catalog + dark/tinted",
     files: [
       {
         path: "ios/AppIcon.appiconset/icon-1024.png",
         size: 1024,
         variant: "fullBleed",
+      },
+      {
+        path: "ios/AppIcon.appiconset/icon-1024-dark.png",
+        size: 1024,
+        variant: "iosDark",
+      },
+      {
+        path: "ios/AppIcon.appiconset/icon-1024-tinted.png",
+        size: 1024,
+        variant: "iosTinted",
       },
     ],
     staticFiles: [
@@ -168,7 +192,10 @@ export const platforms: Platform[] = [
 
 Drag \`ios/AppIcon.appiconset/\` into your Xcode asset catalog (replacing the
 existing AppIcon set). The icon is exported full-bleed — iOS applies its own
-corner mask.`,
+corner mask. The set includes all three iOS 18 appearances: the standard icon,
+a dark variant (transparent background — the system supplies the dark
+backdrop), and a tinted variant (grayscale — the system tints it to match the
+user's accent color).`,
   },
   {
     id: "android",

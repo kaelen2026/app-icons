@@ -8,7 +8,9 @@ export type RenderVariant =
   | "adaptiveBackground" // background layer only, full bleed
   | "maskable" // full bleed, foreground in the PWA 80% safe zone
   | "harmonyForeground" // transparent bg, foreground in the HarmonyOS 672/1024px safe zone
-  | "monochrome"; // alpha-only foreground for Android 13+ themed icons — the launcher tints it
+  | "monochrome" // alpha-only foreground for Android 13+ themed icons — the launcher tints it
+  | "iosDark" // transparent bg, foreground as-is — iOS 18 dark mode supplies its own backdrop
+  | "iosTinted"; // transparent bg, grayscale foreground — iOS 18 tints it to the user's accent
 
 type VariantSpec = {
   clip: boolean;
@@ -17,6 +19,8 @@ type VariantSpec = {
   fgScale: number;
   /** Flatten the drawn foreground to a white alpha mask. */
   monochrome?: boolean;
+  /** Reduce the drawn foreground to grayscale, preserving luminance. */
+  grayscale?: boolean;
 };
 
 const VARIANTS: Record<RenderVariant, VariantSpec> = {
@@ -47,6 +51,14 @@ const VARIANTS: Record<RenderVariant, VariantSpec> = {
     foreground: true,
     fgScale: 66 / 108,
     monochrome: true,
+  },
+  iosDark: { clip: false, background: false, foreground: true, fgScale: 1 },
+  iosTinted: {
+    clip: false,
+    background: false,
+    foreground: true,
+    fgScale: 1,
+    grayscale: true,
   },
 };
 
@@ -287,6 +299,19 @@ export async function drawIcon(
       ctx.globalCompositeOperation = "source-in";
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, size, size);
+    }
+    if (spec.grayscale) {
+      // Pixel-loop instead of ctx.filter for deterministic output everywhere
+      const image = ctx.getImageData(0, 0, size, size);
+      const px = image.data;
+      for (let i = 0; i < px.length; i += 4) {
+        // Rec. 709 luma weights
+        const y = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
+        px[i] = y;
+        px[i + 1] = y;
+        px[i + 2] = y;
+      }
+      ctx.putImageData(image, 0, 0);
     }
   }
   ctx.restore();

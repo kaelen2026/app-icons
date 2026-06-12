@@ -70,12 +70,12 @@ export const landingPages: LandingPage[] = [
     slug: "ios-app-icon-generator",
     navLabel: "iOS icon generator",
     platformIds: ["ios"],
-    metaTitle: "iOS App Icon Generator — Free 1024px Xcode Asset Catalog",
+    metaTitle: "iOS App Icon Generator — Xcode Catalog with Dark & Tinted",
     metaDescription:
-      "Generate an iOS app icon in your browser: a 1024×1024 full-bleed PNG inside a ready-to-drop AppIcon.appiconset with Contents.json for Xcode 14+. Free, no upload, no sign-up.",
-    h1: "iOS app icon generator — Xcode-ready asset catalog",
+      "Generate an iOS app icon in your browser: a ready-to-drop AppIcon.appiconset with all three iOS 18 appearances — standard, dark, and tinted — plus Contents.json for Xcode. Free, no upload, no sign-up.",
+    h1: "iOS app icon generator — Xcode-ready, with dark and tinted variants",
     intro:
-      "Design once and download an AppIcon.appiconset you can drag straight into Xcode: a 1024×1024 full-bleed PNG plus the Contents.json that Xcode 14+ single-size catalogs expect. iOS applies its own corner mask, and the preview shows you exactly how the squircle crop will land.",
+      "Design once and download an AppIcon.appiconset you can drag straight into Xcode: a 1024×1024 full-bleed PNG plus the dark and tinted variants iOS 18 home screens use, wired together by the Contents.json that modern single-size catalogs expect. iOS applies its own corner mask, and the preview shows you exactly how the squircle crop will land.",
     highlights: [
       {
         title: "Single-size catalog",
@@ -108,6 +108,11 @@ export const landingPages: LandingPage[] = [
         question: "How do I import the icon into Xcode?",
         answer:
           "Unzip the export and drag the ios/AppIcon.appiconset folder into your asset catalog, replacing the existing AppIcon set. Contents.json is included, so Xcode recognizes it immediately.",
+      },
+      {
+        question: "What are iOS 18 dark and tinted icons?",
+        answer:
+          "Since iOS 18, users can switch their home screen to dark or tinted icon styles. The export includes a dark variant (your foreground on a transparent background — the system supplies the dark backdrop) and a tinted variant (grayscale, which the system tints to the user's accent color), declared in Contents.json so Xcode picks them up automatically.",
       },
       {
         question: "Does this work for macOS or watchOS icons too?",
