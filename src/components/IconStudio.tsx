@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { saveAs } from "file-saver";
 import { useCallback, useEffect, useRef, useState } from "react";
 import BackgroundPanel from "@/components/BackgroundPanel";
@@ -22,9 +23,13 @@ import { defaultIconConfig } from "@/types/icon";
 
 const MARK_STAGGER_MS = 70;
 
-// Rendered with ssr:false (see app/page.tsx), so localStorage is readable in
+// Rendered with ssr:false (see StudioLoader), so localStorage is readable in
 // the lazy initializer and the stored design lands in the very first render.
-export default function IconStudio() {
+export default function IconStudio({
+  initialPlatforms,
+}: {
+  initialPlatforms?: PlatformId[];
+}) {
   const [config, setConfig] = useState<IconConfig>(
     () => loadStoredConfig() ?? defaultIconConfig,
   );
@@ -32,7 +37,9 @@ export default function IconStudio() {
   const [completed, setCompleted] = useState<string[]>([]);
   const [saved, setSaved] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-  const [selected, setSelected] = useState<PlatformId[]>(allPlatformIds);
+  const [selected, setSelected] = useState<PlatformId[]>(
+    initialPlatforms ?? allPlatformIds,
+  );
   const [importNote, setImportNote] = useState<{
     text: string;
     error: boolean;
@@ -131,6 +138,7 @@ export default function IconStudio() {
       await new Promise((r) => setTimeout(r, remaining));
       saveAs(blob, zipFileName(config));
       setSaved(true);
+      track("export", { platforms: selected.join(",") });
     } catch (err) {
       // stop queued checkmarks from animating in under the error message
       markTimers.current.forEach(clearTimeout);

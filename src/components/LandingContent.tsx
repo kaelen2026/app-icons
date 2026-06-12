@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { landingPages } from "@/lib/landingPages";
 import { siteDescription, siteName, siteUrl } from "@/lib/site";
 
 // Server-rendered marketing/FAQ copy below the studio. This is the only text
@@ -154,6 +156,24 @@ export default function LandingContent() {
               </li>
             ))}
           </ol>
+        </div>
+
+        <div>
+          <h2 className="text-[11px] tracking-[0.18em] text-text-faint">
+            DEDICATED TOOLS
+          </h2>
+          <ul className="mt-4 flex flex-col gap-2 text-[13px]">
+            {landingPages.map((page) => (
+              <li key={page.slug}>
+                <Link
+                  href={`/${page.slug}`}
+                  className="text-accent hover:underline"
+                >
+                  {page.navLabel}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div>
