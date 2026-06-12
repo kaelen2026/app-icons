@@ -2,7 +2,7 @@
 
 import { track } from "@vercel/analytics";
 import { saveAs } from "file-saver";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BackgroundPanel from "@/components/BackgroundPanel";
 import ExportPanel from "@/components/ExportPanel";
 import ForegroundPanel from "@/components/ForegroundPanel";
@@ -19,6 +19,7 @@ import { loadStoredConfig, saveStoredConfig } from "@/lib/configStorage";
 import type { PlatformId } from "@/lib/exportPresets";
 import { allPlatformIds } from "@/lib/exportPresets";
 import { randomStylePatch } from "@/lib/presets";
+import { getReadinessReport } from "@/lib/readiness";
 import type { IconConfig } from "@/types/icon";
 import { defaultIconConfig } from "@/types/icon";
 
@@ -54,6 +55,10 @@ export default function IconStudio({
     trackExport: (platforms) =>
       track("export", { platforms: platforms.join(",") }),
   });
+  const readiness = useMemo(
+    () => getReadinessReport(config, selected),
+    [config, selected],
+  );
 
   useEffect(() => {
     // Debounced: config changes per keystroke / slider tick, and imageSrc can
@@ -250,6 +255,7 @@ export default function IconStudio({
               exporting={exporting}
               completed={completed}
               saved={saved}
+              readiness={readiness}
               selected={selected}
               zipName={zipName}
               onToggle={togglePlatform}
