@@ -1,66 +1,11 @@
-import type { IconConfig, IconShape, TextFont } from "@/types/icon";
+import type { IconConfig, TextFont } from "@/types/icon";
+import { drawBackground } from "./drawBackground";
+import { traceShapePath } from "./drawShape";
 import { lucideSvgDataUrl } from "./lucide";
+import { createRenderCanvas, encodeCanvasPng } from "./renderCanvas";
+import { getRenderVariantSpec, type RenderVariant } from "./renderVariants";
 
-export type RenderVariant =
-  | "masked" // shape clip + background + foreground (preview / default)
-  | "fullBleed" // square, no clip — for targets that apply their own mask (iOS, Play Store)
-  | "adaptiveForeground" // transparent bg, foreground in the Android 66/108dp safe zone
-  | "adaptiveBackground" // background layer only, full bleed
-  | "maskable" // full bleed, foreground in the PWA 80% safe zone
-  | "harmonyForeground" // transparent bg, foreground in the HarmonyOS 672/1024px safe zone
-  | "monochrome" // alpha-only foreground for Android 13+ themed icons — the launcher tints it
-  | "iosDark" // transparent bg, foreground as-is — iOS 18 dark mode supplies its own backdrop
-  | "iosTinted"; // transparent bg, grayscale foreground — iOS 18 tints it to the user's accent
-
-type VariantSpec = {
-  clip: boolean;
-  background: boolean;
-  foreground: boolean;
-  fgScale: number;
-  /** Flatten the drawn foreground to a white alpha mask. */
-  monochrome?: boolean;
-  /** Reduce the drawn foreground to grayscale, preserving luminance. */
-  grayscale?: boolean;
-};
-
-const VARIANTS: Record<RenderVariant, VariantSpec> = {
-  masked: { clip: true, background: true, foreground: true, fgScale: 1 },
-  fullBleed: { clip: false, background: true, foreground: true, fgScale: 1 },
-  adaptiveForeground: {
-    clip: false,
-    background: false,
-    foreground: true,
-    fgScale: 66 / 108,
-  },
-  adaptiveBackground: {
-    clip: false,
-    background: true,
-    foreground: false,
-    fgScale: 1,
-  },
-  maskable: { clip: false, background: true, foreground: true, fgScale: 0.8 },
-  harmonyForeground: {
-    clip: false,
-    background: false,
-    foreground: true,
-    fgScale: 672 / 1024,
-  },
-  monochrome: {
-    clip: false,
-    background: false,
-    foreground: true,
-    fgScale: 66 / 108,
-    monochrome: true,
-  },
-  iosDark: { clip: false, background: false, foreground: true, fgScale: 1 },
-  iosTinted: {
-    clip: false,
-    background: false,
-    foreground: true,
-    fgScale: 1,
-    grayscale: true,
-  },
-};
+export type { RenderVariant } from "./renderVariants";
 
 const imageCache = new Map<string, HTMLImageElement>();
 
@@ -78,86 +23,6 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     img.onerror = () => reject(new Error("Failed to load image"));
     img.src = src;
   });
-}
-
-function traceShapePath(
-  ctx: CanvasRenderingContext2D,
-  shape: IconShape,
-  size: number,
-) {
-  const half = size / 2;
-  ctx.beginPath();
-  switch (shape) {
-    case "square":
-      ctx.rect(0, 0, size, size);
-      break;
-    case "rounded": {
-      // iOS-style corner radius (~22.5% of size)
-      const r = size * 0.225;
-      ctx.roundRect(0, 0, size, size, r);
-      break;
-    }
-    case "circle":
-      ctx.arc(half, half, half, 0, Math.PI * 2);
-      break;
-    case "squircle": {
-      // Superellipse |x|^n + |y|^n = r^n with n = 5
-      const n = 5;
-      const steps = 128;
-      for (let i = 0; i <= steps; i++) {
-        const t = (i / steps) * Math.PI * 2;
-        const cos = Math.cos(t);
-        const sin = Math.sin(t);
-        const x = half + half * Math.sign(cos) * Math.abs(cos) ** (2 / n);
-        const y = half + half * Math.sign(sin) * Math.abs(sin) ** (2 / n);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      break;
-    }
-  }
-}
-
-function drawBackground(
-  ctx: CanvasRenderingContext2D,
-  config: IconConfig,
-  size: number,
-) {
-  const half = size / 2;
-  if (config.bgType === "linear") {
-    // CSS angle convention: 0° points up, increasing clockwise
-    const rad = (config.bgAngle * Math.PI) / 180;
-    const dx = Math.sin(rad);
-    const dy = -Math.cos(rad);
-    // extend the axis so the gradient spans the full square at any angle
-    const ext = half * (Math.abs(dx) + Math.abs(dy));
-    const gradient = ctx.createLinearGradient(
-      half - dx * ext,
-      half - dy * ext,
-      half + dx * ext,
-      half + dy * ext,
-    );
-    gradient.addColorStop(0, config.bgColor1);
-    gradient.addColorStop(1, config.bgColor2);
-    ctx.fillStyle = gradient;
-  } else if (config.bgType === "radial") {
-    // center → corners so color_2 fully reaches the square's corners
-    const gradient = ctx.createRadialGradient(
-      half,
-      half,
-      0,
-      half,
-      half,
-      half * Math.SQRT2,
-    );
-    gradient.addColorStop(0, config.bgColor1);
-    gradient.addColorStop(1, config.bgColor2);
-    ctx.fillStyle = gradient;
-  } else {
-    ctx.fillStyle = config.bgColor1;
-  }
-  ctx.fillRect(0, 0, size, size);
 }
 
 /** Translate to icon center (with offset) and apply rotation; caller must save/restore. */
@@ -310,7 +175,7 @@ export async function drawIcon(
   size: number,
   variant: RenderVariant = "masked",
 ): Promise<void> {
-  const spec = VARIANTS[variant];
+  const spec = getRenderVariantSpec(variant);
   ctx.clearRect(0, 0, size, size);
   ctx.save();
   if (spec.clip) {
@@ -343,7 +208,10 @@ export async function drawIcon(
       const px = image.data;
       for (let i = 0; i < px.length; i += 4) {
         // Rec. 709 luma weights
-        const y = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
+        const y =
+          0.2126 * (px[i] ?? 0) +
+          0.7152 * (px[i + 1] ?? 0) +
+          0.0722 * (px[i + 2] ?? 0);
         px[i] = y;
         px[i + 1] = y;
         px[i + 2] = y;
@@ -360,11 +228,7 @@ export async function renderIconDataUrl(
   size: number,
   variant: RenderVariant = "masked",
 ): Promise<string> {
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas 2D context unavailable");
+  const { canvas, ctx } = createRenderCanvas(size);
   await drawIcon(ctx, config, size, variant);
   return canvas.toDataURL("image/png");
 }
@@ -374,16 +238,7 @@ export async function renderIcon(
   size: number,
   variant: RenderVariant = "masked",
 ): Promise<Blob> {
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas 2D context unavailable");
+  const { canvas, ctx } = createRenderCanvas(size);
   await drawIcon(ctx, config, size, variant);
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error("Failed to encode PNG"));
-    }, "image/png");
-  });
+  return encodeCanvasPng(canvas);
 }

@@ -15,9 +15,11 @@ export default defineConfig({
       include: [
         "src/lib/configStorage.ts",
         "src/lib/exportPresets.ts",
+        "src/lib/iconConfigSchema.ts",
         "src/lib/ico.ts",
         "src/lib/lucide.ts",
         "src/lib/presets.ts",
+        "src/lib/renderVariants.ts",
         "src/lib/savedDesigns.ts",
         "src/lib/variations.ts",
       ],

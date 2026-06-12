@@ -10,32 +10,17 @@ import IconPreview from "@/components/IconPreview";
 import SavedDesignsPanel from "@/components/SavedDesignsPanel";
 import ShapePanel from "@/components/ShapePanel";
 import TransformPanel from "@/components/TransformPanel";
+import { useIconConfigHistory } from "@/components/useIconConfigHistory";
+import { useIconExport } from "@/components/useIconExport";
+import { useImportConfig } from "@/components/useImportConfig";
+import { useSavedDesigns } from "@/components/useSavedDesigns";
 import VariationPanel from "@/components/VariationPanel";
-import {
-  loadStoredConfig,
-  parseIconConfig,
-  parsePlatformIds,
-  saveStoredConfig,
-} from "@/lib/configStorage";
+import { loadStoredConfig, saveStoredConfig } from "@/lib/configStorage";
 import type { PlatformId } from "@/lib/exportPresets";
-import { allPlatformIds, exportFileList } from "@/lib/exportPresets";
-import { exportZip, zipFileName } from "@/lib/exportZip";
+import { allPlatformIds } from "@/lib/exportPresets";
 import { randomStylePatch } from "@/lib/presets";
-import {
-  createSavedDesign,
-  loadSavedDesigns,
-  type SavedDesign,
-  saveSavedDesigns,
-} from "@/lib/savedDesigns";
 import type { IconConfig } from "@/types/icon";
 import { defaultIconConfig } from "@/types/icon";
-
-const MARK_STAGGER_MS = 70;
-const HISTORY_LIMIT = 30;
-
-function sameConfig(a: IconConfig, b: IconConfig): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
 
 // Rendered with ssr:false (see StudioLoader), so localStorage is readable in
 // the lazy initializer and the stored design lands in the very first render.
@@ -44,29 +29,31 @@ export default function IconStudio({
 }: {
   initialPlatforms?: PlatformId[];
 }) {
-  const [config, setConfig] = useState<IconConfig>(
+  const [initialConfig] = useState<IconConfig>(
     () => loadStoredConfig() ?? defaultIconConfig,
   );
-  const [history, setHistory] = useState<{
-    past: IconConfig[];
-    future: IconConfig[];
-  }>({ past: [], future: [] });
-  const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>(() =>
-    loadSavedDesigns(),
-  );
-  const [exporting, setExporting] = useState(false);
-  const [completed, setCompleted] = useState<string[]>([]);
-  const [saved, setSaved] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null);
+  const { canRedo, canUndo, commitConfig, config, redo, undo } =
+    useIconConfigHistory(initialConfig);
+  const { deleteDesign, saveDesign, savedDesigns } = useSavedDesigns();
   const [selected, setSelected] = useState<PlatformId[]>(
     initialPlatforms ?? allPlatformIds,
   );
-  const [importNote, setImportNote] = useState<{
-    text: string;
-    error: boolean;
-  } | null>(null);
-  const markTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const importInputRef = useRef<HTMLInputElement>(null);
+  const {
+    completed,
+    download: handleDownload,
+    exportError,
+    exporting,
+    resetExportStatus,
+    saved,
+    zipName,
+  } = useIconExport({
+    config,
+    saveBlob: saveAs,
+    selected,
+    trackExport: (platforms) =>
+      track("export", { platforms: platforms.join(",") }),
+  });
 
   useEffect(() => {
     // Debounced: config changes per keystroke / slider tick, and imageSrc can
@@ -74,17 +61,6 @@ export default function IconStudio({
     const timer = setTimeout(() => saveStoredConfig(config), 300);
     return () => clearTimeout(timer);
   }, [config]);
-
-  useEffect(() => {
-    saveSavedDesigns(savedDesigns);
-  }, [savedDesigns]);
-
-  useEffect(() => {
-    const timers = markTimers;
-    return () => {
-      timers.current.forEach(clearTimeout);
-    };
-  }, []);
 
   const togglePlatform = useCallback((id: PlatformId) => {
     // filter against the registry so the selection keeps canonical order
@@ -99,136 +75,45 @@ export default function IconStudio({
     setSelected(all ? allPlatformIds : []);
   }, []);
 
-  const commitConfig = useCallback((next: IconConfig | Partial<IconConfig>) => {
-    setConfig((prev) => {
-      const nextConfig =
-        "fgMode" in next && "appName" in next
-          ? (next as IconConfig)
-          : { ...prev, ...next };
-      if (sameConfig(prev, nextConfig)) return prev;
-      setHistory((current) => ({
-        past: [...current.past.slice(-(HISTORY_LIMIT - 1)), prev],
-        future: [],
-      }));
-      return nextConfig;
-    });
-    setCompleted([]);
-    setSaved(false);
-    setImportNote(null);
-  }, []);
+  const commitDesign = useCallback(
+    (next: IconConfig | Partial<IconConfig>) => {
+      commitConfig(next);
+      resetExportStatus();
+    },
+    [commitConfig, resetExportStatus],
+  );
+
+  const {
+    clearImportNote,
+    importFile: handleImportFile,
+    importNote,
+  } = useImportConfig({
+    onImportConfig: commitDesign,
+    onImportPlatforms: setSelected,
+  });
+
+  const applyDesign = useCallback(
+    (next: IconConfig | Partial<IconConfig>) => {
+      commitDesign(next);
+      clearImportNote();
+    },
+    [clearImportNote, commitDesign],
+  );
 
   const update = useCallback(
     (patch: Partial<IconConfig>) => {
-      commitConfig(patch);
+      applyDesign(patch);
     },
-    [commitConfig],
+    [applyDesign],
   );
-
-  const undo = useCallback(() => {
-    setHistory((current) => {
-      if (current.past.length === 0) return current;
-      const previous = current.past[current.past.length - 1];
-      setConfig(previous);
-      return {
-        past: current.past.slice(0, -1),
-        future: [config, ...current.future].slice(0, HISTORY_LIMIT),
-      };
-    });
-  }, [config]);
-
-  const redo = useCallback(() => {
-    setHistory((current) => {
-      if (current.future.length === 0) return current;
-      const next = current.future[0];
-      setConfig(next);
-      return {
-        past: [...current.past.slice(-(HISTORY_LIMIT - 1)), config],
-        future: current.future.slice(1),
-      };
-    });
-  }, [config]);
 
   const saveCurrentDesign = useCallback(() => {
-    setSavedDesigns((prev) =>
-      [createSavedDesign(config), ...prev].slice(0, 12),
-    );
-  }, [config]);
+    saveDesign(config);
+  }, [config, saveDesign]);
 
   const handleReset = useCallback(() => {
-    commitConfig(defaultIconConfig);
-    setCompleted([]);
-    setSaved(false);
-    setImportNote(null);
-  }, [commitConfig]);
-
-  const handleImportFile = useCallback(
-    async (file: File | undefined) => {
-      if (!file) return;
-      try {
-        const data: unknown = JSON.parse(await file.text());
-        const parsed = parseIconConfig(data);
-        if (!parsed) throw new Error("not an icon config");
-        commitConfig(parsed);
-        // exported icon-config.json also records the platform selection
-        const ids = parsePlatformIds(data);
-        if (ids) setSelected(ids);
-        setCompleted([]);
-        setSaved(false);
-        // exports strip the image data URL, so image-mode configs come back
-        // without their source image
-        setImportNote(
-          parsed.fgMode === "image" && !parsed.imageSrc
-            ? {
-                text: "config imported — re-upload the source image",
-                error: false,
-              }
-            : null,
-        );
-      } catch {
-        setImportNote({ text: "not a valid icon-config.json", error: true });
-      }
-    },
-    [commitConfig],
-  );
-
-  const handleDownload = useCallback(async () => {
-    setExporting(true);
-    setSaved(false);
-    setExportError(null);
-    setCompleted([]);
-    markTimers.current.forEach(clearTimeout);
-    markTimers.current = [];
-
-    const start = performance.now();
-    let index = 0;
-    try {
-      const blob = await exportZip(config, selected, (path) => {
-        // pace the checkmarks so each lands ≥ index * stagger after start
-        const at = index * MARK_STAGGER_MS;
-        index++;
-        const delay = Math.max(0, at - (performance.now() - start));
-        markTimers.current.push(
-          setTimeout(() => setCompleted((prev) => [...prev, path]), delay),
-        );
-      });
-      // let the last checkmarks land before the zip drops
-      const lastMark = exportFileList(selected).length * MARK_STAGGER_MS;
-      const remaining = Math.max(0, lastMark - (performance.now() - start));
-      await new Promise((r) => setTimeout(r, remaining));
-      saveAs(blob, zipFileName(config));
-      setSaved(true);
-      track("export", { platforms: selected.join(",") });
-    } catch (err) {
-      // stop queued checkmarks from animating in under the error message
-      markTimers.current.forEach(clearTimeout);
-      markTimers.current = [];
-      setExportError(
-        err instanceof Error ? err.message : "export failed. retry.",
-      );
-    } finally {
-      setExporting(false);
-    }
-  }, [config, selected]);
+    applyDesign(defaultIconConfig);
+  }, [applyDesign]);
 
   return (
     <div className="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
@@ -282,7 +167,7 @@ export default function IconStudio({
           <button
             type="button"
             onClick={undo}
-            disabled={history.past.length === 0}
+            disabled={!canUndo}
             title="undo last design change"
             className="min-h-11 rounded-sm border border-hairline px-3 py-2 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -291,7 +176,7 @@ export default function IconStudio({
           <button
             type="button"
             onClick={redo}
-            disabled={history.future.length === 0}
+            disabled={!canRedo}
             title="redo design change"
             className="min-h-11 rounded-sm border border-hairline px-3 py-2 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -328,18 +213,14 @@ export default function IconStudio({
         <aside className="order-2 border-b border-hairline lg:order-none lg:overflow-y-auto lg:border-b-0 lg:border-r">
           <div className="divide-y divide-hairline">
             <div className="p-5">
-              <VariationPanel config={config} onApply={commitConfig} />
+              <VariationPanel config={config} onApply={applyDesign} />
             </div>
             <div className="p-5">
               <SavedDesignsPanel
                 designs={savedDesigns}
                 onSave={saveCurrentDesign}
-                onRestore={(design) => commitConfig(design.config)}
-                onDelete={(id) =>
-                  setSavedDesigns((prev) =>
-                    prev.filter((design) => design.id !== id),
-                  )
-                }
+                onRestore={(design) => applyDesign(design.config)}
+                onDelete={deleteDesign}
               />
             </div>
             <div className="p-5">
@@ -370,7 +251,7 @@ export default function IconStudio({
               completed={completed}
               saved={saved}
               selected={selected}
-              zipName={zipFileName(config)}
+              zipName={zipName}
               onToggle={togglePlatform}
               onSelectAll={selectAllPlatforms}
               onDownload={handleDownload}

@@ -17,6 +17,10 @@ This runs:
 - `pnpm typecheck`: TypeScript compiler checks.
 - `pnpm build`: production Next build.
 
+TypeScript is intentionally strict: `strict`, `noUncheckedIndexedAccess`,
+`exactOptionalPropertyTypes`, `noImplicitOverride`, and `allowJs: false` are
+enabled in `tsconfig.json`.
+
 ## Focused Checks
 
 ```sh
@@ -32,3 +36,10 @@ pnpm deps:outdated   # available dependency updates
 `pnpm audit:deps` is intentionally separate from `pnpm quality` because
 registry advisories can change independently from source changes. Run it before
 release and when updating dependencies.
+
+## Architecture Checks
+
+Use [docs/coding-standards.md](coding-standards.md) when changing app structure.
+Record durable architectural decisions in [docs/adr](adr). New shared behavior
+should move into tested hooks or `src/lib` modules instead of accumulating in
+large UI components.

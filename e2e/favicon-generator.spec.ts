@@ -23,7 +23,7 @@ test("edits the design and downloads the favicon pack", async ({ page }) => {
         const context = (node as HTMLCanvasElement).getContext("2d");
         if (!context) return false;
         const pixel = context.getImageData(512, 512, 1, 1).data;
-        return pixel[3] > 0;
+        return (pixel[3] ?? 0) > 0;
       }),
     )
     .toBe(true);

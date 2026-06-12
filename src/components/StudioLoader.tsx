@@ -15,5 +15,9 @@ export default function StudioLoader({
 }: {
   initialPlatforms?: PlatformId[];
 }) {
-  return <IconStudio initialPlatforms={initialPlatforms} />;
+  return initialPlatforms ? (
+    <IconStudio initialPlatforms={initialPlatforms} />
+  ) : (
+    <IconStudio />
+  );
 }

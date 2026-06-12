@@ -47,6 +47,10 @@ Markdown lint, secret scanning, ESLint, Biome, dead-code detection, typecheck,
 and production build. See `docs/quality.md` for the full local quality tool
 map.
 
+Component coverage includes React components and colocated component hooks.
+Unit coverage includes pure `src/lib` modules such as config parsing, export
+registries, presets, and render variant data.
+
 Run `pnpm test` before the release gate when changing app behavior. Run
 `pnpm test:e2e` when changing routing, export/download behavior, canvas
 rendering, or responsive layout. Run `pnpm test:e2e:prod` after `pnpm build`

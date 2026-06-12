@@ -14,6 +14,14 @@ function wrapIndex(index: number, length: number): number {
   return ((index % length) + length) % length;
 }
 
+function atWrapped<T>(items: readonly T[], index: number): T {
+  const item = items[wrapIndex(index, items.length)];
+  if (item === undefined) {
+    throw new Error("Cannot select from an empty list");
+  }
+  return item;
+}
+
 function presetIndexFor(config: IconConfig): number {
   const index = stylePresets.findIndex(
     (preset) =>
@@ -51,16 +59,14 @@ export function generateConfigVariations(
   const presetIndex = presetIndexFor(config);
   const iconIndex = iconIndexFor(config);
   const currentShapeIndex = SHAPES.indexOf(config.shape);
-  const nextShape = SHAPES[wrapIndex(currentShapeIndex + 1, SHAPES.length)];
-  const altShape = SHAPES[wrapIndex(currentShapeIndex + 2, SHAPES.length)];
+  const nextShape = atWrapped(SHAPES, currentShapeIndex + 1);
+  const altShape = atWrapped(SHAPES, currentShapeIndex + 2);
 
-  const calmPreset =
-    stylePresets[wrapIndex(presetIndex + 1, stylePresets.length)];
-  const boldPreset =
-    stylePresets[wrapIndex(presetIndex + 3, stylePresets.length)];
+  const calmPreset = atWrapped(stylePresets, presetIndex + 1);
+  const boldPreset = atWrapped(stylePresets, presetIndex + 3);
   const lightPreset =
     stylePresets.find((preset) => preset.name === "paper") ??
-    stylePresets[wrapIndex(presetIndex + 5, stylePresets.length)];
+    atWrapped(stylePresets, presetIndex + 5);
 
   return [
     withPatch(config, "color-calm", "calm", presetPatch(calmPreset)),
@@ -73,8 +79,7 @@ export function generateConfigVariations(
     }),
     withPatch(config, "icon-swap", "swap icon", {
       fgMode: "icon",
-      iconName:
-        popularIconNames[wrapIndex(iconIndex + 7, popularIconNames.length)],
+      iconName: atWrapped(popularIconNames, iconIndex + 7),
     }),
   ];
 }

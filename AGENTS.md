@@ -60,6 +60,14 @@ use the existing tokens in `src/app/globals.css`, preserve mobile ergonomics,
 avoid decorative marketing patterns, and add/update interaction tests when
 component behavior changes.
 
+## Coding standards
+
+Before structural refactors, read `docs/coding-standards.md` and relevant ADRs
+in `docs/adr/`. Keep `IconConfig` as the single source of design state, keep
+Canvas rendering outside React, and prefer tested hooks or `src/lib` modules for
+shared behavior. TypeScript is intentionally strict; do not loosen `tsconfig`
+without documenting the tradeoff.
+
 ## Boundaries
 
 Everything runs client-side in the browser. Do not add server routes, API handlers, databases, or auth.

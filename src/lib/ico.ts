@@ -22,6 +22,8 @@ export async function encodeIco(
 
   let offset = dirBytes;
   entries.forEach(({ size }, i) => {
+    const buffer = buffers[i];
+    if (!buffer) throw new Error("ICO entry buffer missing");
     const base = HEADER_BYTES + ENTRY_BYTES * i;
     const dimension = size >= 256 ? 0 : size; // 0 encodes 256
     dir.setUint8(base, dimension); // width
@@ -30,9 +32,9 @@ export async function encodeIco(
     dir.setUint8(base + 3, 0); // reserved
     dir.setUint16(base + 4, 1, true); // color planes
     dir.setUint16(base + 6, 32, true); // bits per pixel
-    dir.setUint32(base + 8, buffers[i].byteLength, true);
+    dir.setUint32(base + 8, buffer.byteLength, true);
     dir.setUint32(base + 12, offset, true);
-    offset += buffers[i].byteLength;
+    offset += buffer.byteLength;
   });
 
   return new Blob([dir.buffer, ...buffers], { type: "image/x-icon" });

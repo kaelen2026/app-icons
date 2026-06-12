@@ -7,20 +7,24 @@ describe("style presets", () => {
   });
 
   it("applies the preset background and foreground colors together", () => {
-    expect(presetPatch(stylePresets[0])).toEqual({
-      ...stylePresets[0].patch,
-      iconColor: stylePresets[0].fgColor,
-      textColor: stylePresets[0].fgColor,
+    const preset = stylePresets[0];
+    if (!preset) throw new Error("missing first preset");
+    expect(presetPatch(preset)).toEqual({
+      ...preset.patch,
+      iconColor: preset.fgColor,
+      textColor: preset.fgColor,
     });
   });
 
   it("builds a random icon-mode patch from curated options", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
 
+    const preset = stylePresets[0];
+    if (!preset) throw new Error("missing first preset");
     expect(randomStylePatch()).toMatchObject({
-      ...stylePresets[0].patch,
-      iconColor: stylePresets[0].fgColor,
-      textColor: stylePresets[0].fgColor,
+      ...preset.patch,
+      iconColor: preset.fgColor,
+      textColor: preset.fgColor,
       fgMode: "icon",
       iconName: "Rocket",
       shape: "rounded",

@@ -144,7 +144,11 @@ export function presetPatch(preset: StylePreset): Partial<IconConfig> {
 const SHAPES: IconShape[] = ["rounded", "circle", "squircle", "square"];
 
 function pick<T>(items: T[]): T {
-  return items[Math.floor(Math.random() * items.length)];
+  const item = items[Math.floor(Math.random() * items.length)];
+  if (item === undefined) {
+    throw new Error("Cannot pick from an empty list");
+  }
+  return item;
 }
 
 /** Random preset × random curated icon × random shape, as one config patch. */

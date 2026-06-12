@@ -12,7 +12,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html", "lcov"],
       reportsDirectory: "./coverage/components",
-      include: ["src/components/**/*.tsx"],
+      include: ["src/components/**/*.{ts,tsx}"],
       exclude: ["src/**/*.test.{ts,tsx}"],
       thresholds: {
         statements: 80,

@@ -73,6 +73,15 @@ Current layers:
 - E2E: Playwright desktop and mobile browser smoke tests
 - Coverage: V8 provider with separate unit/component reports
 
+## Engineering Practices
+
+See [docs/coding-standards.md](docs/coding-standards.md) and
+[docs/quality.md](docs/quality.md).
+
+Architecture decisions are recorded in [docs/adr](docs/adr). Current guardrails:
+browser-only execution, registry-driven platform exports, Canvas rendering
+outside React, and compact config snapshots without uploaded image bytes.
+
 ## Design System
 
 See [docs/design-system.md](docs/design-system.md).
