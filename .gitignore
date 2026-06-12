@@ -46,3 +46,6 @@ next-env.d.ts
 
 # local scratch
 pool.txt
+
+# editor
+.vscode/
