@@ -33,13 +33,26 @@ export default function IconStudio() {
   const [saved, setSaved] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [selected, setSelected] = useState<PlatformId[]>(allPlatformIds);
-  const [importError, setImportError] = useState<string | null>(null);
+  const [importNote, setImportNote] = useState<{
+    text: string;
+    error: boolean;
+  } | null>(null);
   const markTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    saveStoredConfig(config);
+    // Debounced: config changes per keystroke / slider tick, and imageSrc can
+    // be a multi-MB data URL — serializing every change would jank the canvas
+    const timer = setTimeout(() => saveStoredConfig(config), 300);
+    return () => clearTimeout(timer);
   }, [config]);
+
+  useEffect(() => {
+    const timers = markTimers;
+    return () => {
+      timers.current.forEach(clearTimeout);
+    };
+  }, []);
 
   const togglePlatform = useCallback((id: PlatformId) => {
     // filter against the registry so the selection keeps canonical order
@@ -62,7 +75,7 @@ export default function IconStudio() {
     setConfig(defaultIconConfig);
     setCompleted([]);
     setSaved(false);
-    setImportError(null);
+    setImportNote(null);
   }, []);
 
   const handleImportFile = useCallback(async (file: File | undefined) => {
@@ -70,14 +83,25 @@ export default function IconStudio() {
     try {
       const data: unknown = JSON.parse(await file.text());
       const parsed = parseIconConfig(data);
-      if (!parsed) throw new Error("not an object");
+      if (!parsed) throw new Error("not an icon config");
       setConfig(parsed);
       // exported icon-config.json also records the platform selection
       const ids = parsePlatformIds(data);
       if (ids) setSelected(ids);
-      setImportError(null);
+      setCompleted([]);
+      setSaved(false);
+      // exports strip the image data URL, so image-mode configs come back
+      // without their source image
+      setImportNote(
+        parsed.fgMode === "image" && !parsed.imageSrc
+          ? {
+              text: "config imported — re-upload the source image",
+              error: false,
+            }
+          : null,
+      );
     } catch {
-      setImportError("not a valid icon-config.json");
+      setImportNote({ text: "not a valid icon-config.json", error: true });
     }
   }, []);
 
@@ -108,6 +132,9 @@ export default function IconStudio() {
       saveAs(blob, zipFileName(config));
       setSaved(true);
     } catch (err) {
+      // stop queued checkmarks from animating in under the error message
+      markTimers.current.forEach(clearTimeout);
+      markTimers.current = [];
       setExportError(
         err instanceof Error ? err.message : "export failed. retry.",
       );
@@ -126,8 +153,14 @@ export default function IconStudio() {
           </span>
         </h1>
         <div className="flex items-center gap-2">
-          {importError && (
-            <span className="text-[11px] text-red-400">{importError}</span>
+          {importNote && (
+            <span
+              className={`text-[11px] ${
+                importNote.error ? "text-red-400" : "text-amber-400"
+              }`}
+            >
+              {importNote.text}
+            </span>
           )}
           <input
             ref={importInputRef}
