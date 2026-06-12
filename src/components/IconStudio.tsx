@@ -154,14 +154,14 @@ export default function IconStudio({
 
   return (
     <div className="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
-      <header className="grid h-12 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b border-hairline px-5">
+      <header className="sticky top-0 z-20 flex shrink-0 flex-col gap-3 border-b border-hairline bg-ink px-4 py-3 sm:grid sm:h-12 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center sm:gap-4 sm:px-5 sm:py-0 lg:static">
         <div className="min-w-0 truncate text-sm text-text">
           app_icons{" "}
           <span className="text-[10px] text-text-faint">
             v0.1 · ios + android + web icon packs
           </span>
         </div>
-        <label className="flex w-56 items-center gap-3 justify-self-center xl:w-72">
+        <label className="flex w-full items-center gap-3 justify-self-center sm:w-56 xl:w-72">
           <span className="shrink-0 text-[11px] tracking-[0.18em] text-text-faint">
             app_name
           </span>
@@ -170,10 +170,10 @@ export default function IconStudio({
             value={config.appName}
             onChange={(e) => update({ appName: e.target.value })}
             placeholder="my-app"
-            className="min-w-0 flex-1 rounded-sm border border-hairline bg-panel-2 px-3 py-1.5 text-xs text-text outline-none transition-colors focus:border-accent"
+            className="min-h-11 min-w-0 flex-1 rounded-sm border border-hairline bg-panel-2 px-3 py-2 text-base text-text outline-none transition-colors focus:border-accent sm:text-xs"
           />
         </label>
-        <div className="flex items-center justify-end gap-2">
+        <div className="grid grid-cols-4 items-center gap-2 sm:flex sm:justify-end">
           {importNote && (
             <span
               className={`text-[11px] ${
@@ -197,7 +197,7 @@ export default function IconStudio({
             type="button"
             onClick={() => update(randomStylePatch())}
             title="random style: preset × icon × shape"
-            className="rounded-sm border border-hairline px-3 py-1.5 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97]"
+            className="min-h-11 rounded-sm border border-hairline px-3 py-2 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97]"
           >
             random
           </button>
@@ -205,14 +205,14 @@ export default function IconStudio({
             type="button"
             onClick={() => importInputRef.current?.click()}
             title="restore a design from an exported icon-config.json"
-            className="rounded-sm border border-hairline px-3 py-1.5 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97]"
+            className="min-h-11 rounded-sm border border-hairline px-3 py-2 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97]"
           >
             import
           </button>
           <button
             type="button"
             onClick={handleReset}
-            className="rounded-sm border border-hairline px-3 py-1.5 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97]"
+            className="min-h-11 rounded-sm border border-hairline px-3 py-2 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97]"
           >
             reset
           </button>
@@ -220,16 +220,16 @@ export default function IconStudio({
             type="button"
             onClick={handleDownload}
             disabled={exporting || selected.length === 0}
-            className="rounded-sm bg-accent px-3 py-1.5 text-[11px] font-medium text-ink transition-all hover:brightness-110 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+            className="min-h-11 rounded-sm bg-accent px-3 py-2 text-[11px] font-medium text-ink transition-all hover:brightness-110 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {exporting ? "rendering…" : "download .zip"}
           </button>
         </div>
       </header>
 
-      <main className="grid flex-1 lg:min-h-0 lg:grid-cols-[300px_1fr_280px]">
+      <main className="grid min-w-0 flex-1 lg:min-h-0 lg:grid-cols-[300px_1fr_280px]">
         {/* left: controls */}
-        <aside className="border-b border-hairline lg:overflow-y-auto lg:border-b-0 lg:border-r">
+        <aside className="order-2 border-b border-hairline lg:order-none lg:overflow-y-auto lg:border-b-0 lg:border-r">
           <div className="divide-y divide-hairline">
             <div className="p-5">
               <ForegroundPanel config={config} onChange={update} />
@@ -247,12 +247,12 @@ export default function IconStudio({
         </aside>
 
         {/* center: preview + context wall */}
-        <section className="border-b border-hairline lg:min-h-0 lg:border-b-0">
+        <section className="order-1 min-w-0 overflow-hidden border-b border-hairline lg:order-none lg:min-h-0 lg:border-b-0">
           <IconPreview config={config} />
         </section>
 
         {/* right: manifest + export */}
-        <aside className="lg:overflow-y-auto lg:border-l lg:border-hairline">
+        <aside className="order-3 lg:order-none lg:overflow-y-auto lg:border-l lg:border-hairline">
           <div className="p-5">
             <ExportPanel
               exporting={exporting}

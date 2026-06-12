@@ -76,7 +76,7 @@ export default function ExportPanel({
           type="button"
           disabled={exporting}
           onClick={() => onSelectAll(!allSelected)}
-          className="text-[11px] text-text-dim transition-colors hover:text-text disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-11 text-[11px] text-text-dim transition-colors hover:text-text disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-0"
         >
           {allSelected ? "clear all" : "select all"}
         </button>
@@ -90,13 +90,13 @@ export default function ExportPanel({
             (platform.staticFiles?.length ?? 0);
           return (
             <li key={platform.id}>
-              <label className="flex cursor-pointer items-baseline gap-2 text-[11px]">
+              <label className="flex min-h-11 cursor-pointer items-center gap-2 text-[11px] sm:min-h-0 sm:items-baseline">
                 <input
                   type="checkbox"
                   checked={checked}
                   disabled={exporting}
                   onChange={() => onToggle(platform.id)}
-                  className="relative top-px size-3 accent-[var(--color-accent,#4ade80)]"
+                  className="size-4 accent-[var(--color-accent,#4ade80)] sm:relative sm:top-px sm:size-3"
                 />
                 <span className={checked ? "text-text" : "text-text-dim"}>
                   {platform.label}
@@ -168,7 +168,7 @@ export default function ExportPanel({
         type="button"
         onClick={onDownload}
         disabled={exporting || none}
-        className="w-full rounded-sm bg-accent px-4 py-2 text-xs font-medium text-ink transition-all hover:brightness-110 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+        className="min-h-12 w-full rounded-sm bg-accent px-4 py-2 text-xs font-medium text-ink transition-all hover:brightness-110 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-0"
       >
         {exporting ? "rendering…" : "download .zip"}
       </button>

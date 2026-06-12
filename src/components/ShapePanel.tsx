@@ -26,7 +26,7 @@ export default function ShapePanel({ config, onChange }: Props) {
               key={shape.value}
               type="button"
               onClick={() => onChange({ shape: shape.value })}
-              className={`flex flex-col items-center gap-1.5 rounded-sm border p-2 transition-colors ${
+              className={`flex min-h-16 flex-col items-center justify-center gap-1.5 rounded-sm border p-2 transition-colors sm:min-h-0 ${
                 active
                   ? "border-accent bg-accent-dim"
                   : "border-hairline hover:border-hairline-bright"

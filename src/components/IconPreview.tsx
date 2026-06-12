@@ -40,9 +40,9 @@ export default function IconPreview({ config }: Props) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-8 py-8">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 py-5 sm:gap-4 sm:px-8 sm:py-8">
         <div
-          className="flex aspect-square max-h-[26rem] w-full min-h-0 max-w-105 items-center justify-center border border-hairline p-5 lg:w-auto lg:max-w-full lg:flex-1"
+          className="flex aspect-square max-h-[20rem] w-full min-h-0 max-w-80 items-center justify-center border border-hairline p-4 sm:max-h-[26rem] sm:max-w-105 sm:p-5 lg:w-auto lg:max-w-full lg:flex-1"
           style={{
             backgroundImage:
               "repeating-conic-gradient(#131316 0% 25%, #0e0e10 0% 50%)",
@@ -60,7 +60,7 @@ export default function IconPreview({ config }: Props) {
           1024 × 1024 · live render
         </p>
       </div>
-      <div className="shrink-0 border-t border-hairline">
+      <div className="min-w-0 shrink-0 overflow-hidden border-t border-hairline">
         <PreviewWall config={config} />
       </div>
     </div>

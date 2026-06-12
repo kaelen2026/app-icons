@@ -41,9 +41,9 @@ export default function PreviewWall({ config }: Props) {
   const name = config.appName.trim() || "my-app";
 
   return (
-    <div className="grid w-full grid-cols-2 gap-px bg-hairline sm:grid-cols-5">
+    <div className="flex w-full max-w-full min-w-0 gap-px overflow-x-auto bg-hairline sm:grid sm:grid-cols-5 sm:overflow-visible">
       {/* iOS home screen */}
-      <figure className="flex flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5">
+      <figure className="flex min-w-32 shrink-0 flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5 sm:min-w-0">
         <span className="flex flex-col items-center gap-1.5">
           {squareSrc && (
             <img
@@ -62,7 +62,7 @@ export default function PreviewWall({ config }: Props) {
       </figure>
 
       {/* Android adaptive */}
-      <figure className="flex flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5">
+      <figure className="flex min-w-32 shrink-0 flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5 sm:min-w-0">
         <span className="flex flex-col items-center gap-1.5">
           {squareSrc && (
             <img src={squareSrc} alt="" className="h-14 w-14 rounded-full" />
@@ -77,7 +77,7 @@ export default function PreviewWall({ config }: Props) {
       </figure>
 
       {/* HarmonyOS home screen: layered icon under the system mask */}
-      <figure className="flex flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5">
+      <figure className="flex min-w-32 shrink-0 flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5 sm:min-w-0">
         <span className="flex flex-col items-center gap-1.5">
           {harmonyBgSrc && harmonyFgSrc && (
             <span className="relative h-14 w-14 overflow-hidden rounded-[25%]">
@@ -103,7 +103,7 @@ export default function PreviewWall({ config }: Props) {
       </figure>
 
       {/* Browser tab */}
-      <figure className="flex flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5">
+      <figure className="flex min-w-32 shrink-0 flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5 sm:min-w-0">
         <span className="flex w-full max-w-36 items-center gap-2 rounded-t-md border border-b-0 border-hairline bg-panel-2 px-2.5 py-2">
           {shapedSrc && <img src={shapedSrc} alt="" className="h-4 w-4" />}
           <span className="min-w-0 flex-1 truncate text-[10px] text-text-dim">
@@ -117,7 +117,7 @@ export default function PreviewWall({ config }: Props) {
       </figure>
 
       {/* PWA install prompt */}
-      <figure className="flex flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5">
+      <figure className="flex min-w-40 shrink-0 flex-col items-center justify-between gap-3 bg-ink px-3 pb-2.5 pt-5 sm:min-w-0">
         <span className="flex w-full max-w-40 items-center gap-2.5 rounded-md border border-hairline bg-panel-2 px-2.5 py-2">
           {shapedSrc && (
             <img src={shapedSrc} alt="" className="h-8 w-8 shrink-0" />

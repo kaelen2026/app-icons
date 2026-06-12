@@ -37,7 +37,7 @@ export default function BackgroundPanel({ config, onChange }: Props) {
               type="button"
               title={preset.name}
               onClick={() => onChange(presetPatch(preset))}
-              className={`h-6 w-6 rounded-[3px] border transition-colors ${
+              className={`h-10 w-10 rounded-[3px] border transition-colors sm:h-6 sm:w-6 ${
                 active
                   ? "border-accent"
                   : "border-hairline hover:border-hairline-bright"
@@ -55,7 +55,7 @@ export default function BackgroundPanel({ config, onChange }: Props) {
               key={type}
               type="button"
               onClick={() => onChange({ bgType: type })}
-              className={`px-3 py-1.5 text-[11px] transition-colors ${
+              className={`px-3 py-3 text-[11px] transition-colors sm:py-1.5 ${
                 active
                   ? "bg-panel-2 text-accent"
                   : "bg-ink text-text-dim hover:text-text"
@@ -72,7 +72,7 @@ export default function BackgroundPanel({ config, onChange }: Props) {
             type="color"
             value={config.bgColor1}
             onChange={(e) => onChange({ bgColor1: e.target.value })}
-            className="h-7 w-7"
+            className="h-11 w-11 sm:h-7 sm:w-7"
           />
           color_1
         </label>
@@ -85,7 +85,7 @@ export default function BackgroundPanel({ config, onChange }: Props) {
             type="color"
             value={config.bgColor2}
             onChange={(e) => onChange({ bgColor2: e.target.value })}
-            className="h-7 w-7"
+            className="h-11 w-11 sm:h-7 sm:w-7"
             disabled={config.bgType === "solid"}
           />
           color_2

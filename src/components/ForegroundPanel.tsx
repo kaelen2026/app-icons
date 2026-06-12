@@ -79,7 +79,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
               key={mode.value}
               type="button"
               onClick={() => onChange({ fgMode: mode.value })}
-              className={`px-2 py-1.5 text-[11px] whitespace-nowrap transition-colors ${
+              className={`px-2 py-3 text-[11px] whitespace-nowrap transition-colors sm:py-1.5 ${
                 active
                   ? "bg-panel-2 text-accent"
                   : "bg-ink text-text-dim hover:text-text"
@@ -181,13 +181,13 @@ export default function ForegroundPanel({ config, onChange }: Props) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="search 1900+ icons…"
-              className="min-w-0 flex-1 rounded-sm border border-hairline bg-panel-2 px-3 py-2 text-xs text-text outline-none transition-colors focus:border-accent"
+              className="min-h-11 min-w-0 flex-1 rounded-sm border border-hairline bg-panel-2 px-3 py-2 text-base text-text outline-none transition-colors focus:border-accent sm:min-h-0 sm:text-xs"
             />
             <input
               type="color"
               value={config.iconColor}
               onChange={(e) => onChange({ iconColor: e.target.value })}
-              className="h-7 w-7 shrink-0"
+              className="h-11 w-11 shrink-0 sm:h-7 sm:w-7"
             />
           </div>
           {visibleIcons.length === 0 ? (
