@@ -16,11 +16,14 @@ pnpm build      # next build
 
 ## Verification
 
-There is no automated test suite yet; lint + typecheck + build is the verification gate. After any code change, all of these must pass:
+The verification gate after code changes is:
 
 ```sh
-pnpm lint && pnpm typecheck && pnpm build
+pnpm test && pnpm lint && pnpm typecheck && pnpm build
 ```
+
+For UI or export-flow changes, also run `pnpm test:e2e`. For coverage-sensitive
+test work, run `pnpm test:coverage`.
 
 Git hooks (husky) enforce this on commit: pre-commit runs lint-staged (Biome + ESLint on staged files), commit-msg runs commitlint — commit messages must follow Conventional Commits (`feat: ...`, `fix: ...`, etc.). Formatting is Biome (2-space indent, double quotes), configured in `biome.json`.
 
@@ -37,6 +40,15 @@ The whole app derives from one state object:
 - **`src/lib/lucide.ts`** — turns Lucide icon nodes into recolored SVG data URLs that feed the image-drawing path in the renderer.
 
 `docs/superpowers/specs/` holds design specs (e.g. the multi-platform export design).
+
+## Design system
+
+Before changing UI, read `docs/design-system.md`. The app uses a dense
+terminal-studio design language: dark tokenized surfaces, hairline borders,
+compact mono typography, restrained radii, and direct tool controls. New UI must
+use the existing tokens in `src/app/globals.css`, preserve mobile ergonomics,
+avoid decorative marketing patterns, and add/update interaction tests when
+component behavior changes.
 
 ## Boundaries
 

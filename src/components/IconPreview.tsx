@@ -45,7 +45,7 @@ export default function IconPreview({ config }: Props) {
           className="flex aspect-square max-h-[20rem] w-full min-h-0 max-w-80 items-center justify-center border border-hairline p-4 sm:max-h-[26rem] sm:max-w-105 sm:p-5 lg:w-auto lg:max-w-full lg:flex-1"
           style={{
             backgroundImage:
-              "repeating-conic-gradient(#131316 0% 25%, #0e0e10 0% 50%)",
+              "repeating-conic-gradient(var(--panel-2) 0% 25%, var(--panel) 0% 50%)",
             backgroundSize: "16px 16px",
           }}
         >

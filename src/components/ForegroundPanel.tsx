@@ -197,6 +197,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
           ) : (
             <div className="grid grid-cols-6 gap-1">
               {visibleIcons.map((name) => {
+                // design-lint-disable-next-line hardcoded-color -- SVG data URLs need a concrete stroke color.
                 const src = lucideSvgDataUrl(name, "#9d9da6");
                 if (!src) return null;
                 const active = config.iconName === name;

@@ -96,7 +96,7 @@ export default function ExportPanel({
                   checked={checked}
                   disabled={exporting}
                   onChange={() => onToggle(platform.id)}
-                  className="size-4 accent-[var(--color-accent,#4ade80)] sm:relative sm:top-px sm:size-3"
+                  className="size-4 accent-accent sm:relative sm:top-px sm:size-3"
                 />
                 <span className={checked ? "text-text" : "text-text-dim"}>
                   {platform.label}

@@ -45,6 +45,7 @@ pool.txt
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+.superpowers/
 
 # local scratch
 pool.txt
