@@ -15,6 +15,7 @@ type Props = {
   selected: PlatformId[];
   zipName: string;
   onToggle: (id: PlatformId) => void;
+  onSelectAll: (all: boolean) => void;
   onDownload: () => void;
 };
 
@@ -58,16 +59,28 @@ export default function ExportPanel({
   selected,
   zipName,
   onToggle,
+  onSelectAll,
   onDownload,
 }: Props) {
   const fileList = exportFileList(selected);
   const none = selected.length === 0;
+  const allSelected = selected.length === platforms.length;
 
   return (
     <section className="space-y-4">
-      <h2 className="text-[11px] tracking-[0.18em] text-text-faint">
-        platforms
-      </h2>
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-[11px] tracking-[0.18em] text-text-faint">
+          platforms
+        </h2>
+        <button
+          type="button"
+          disabled={exporting}
+          onClick={() => onSelectAll(!allSelected)}
+          className="text-[11px] text-text-dim transition-colors hover:text-text disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {allSelected ? "clear all" : "select all"}
+        </button>
+      </div>
       <ul className="space-y-1.5">
         {platforms.map((platform) => {
           const checked = selected.includes(platform.id);

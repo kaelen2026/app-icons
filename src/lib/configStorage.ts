@@ -46,9 +46,13 @@ function pickColor(value: unknown, fallback: string): string {
  * defaults, numbers are clamped to the slider ranges.
  */
 export function parseIconConfig(data: unknown): IconConfig | null {
-  if (typeof data !== "object" || data === null) return null;
+  if (typeof data !== "object" || data === null || Array.isArray(data))
+    return null;
   const d = data as Record<string, unknown>;
   const def = defaultIconConfig;
+  // Require at least one recognizable field, so importing an unrelated JSON
+  // file fails loudly instead of silently resetting the design to defaults
+  if (!Object.keys(def).some((key) => key in d)) return null;
   return {
     fgMode: pickEnum(d.fgMode, FG_MODES, def.fgMode),
     // blob: URLs are session-bound; only persisted data URLs survive a reload

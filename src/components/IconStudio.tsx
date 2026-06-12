@@ -50,6 +50,10 @@ export default function IconStudio() {
     );
   }, []);
 
+  const selectAllPlatforms = useCallback((all: boolean) => {
+    setSelected(all ? allPlatformIds : []);
+  }, []);
+
   const update = useCallback((patch: Partial<IconConfig>) => {
     setConfig((prev) => ({ ...prev, ...patch }));
   }, []);
@@ -207,6 +211,7 @@ export default function IconStudio() {
               selected={selected}
               zipName={zipFileName(config)}
               onToggle={togglePlatform}
+              onSelectAll={selectAllPlatforms}
               onDownload={handleDownload}
             />
             {exportError && (

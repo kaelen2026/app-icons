@@ -5,6 +5,11 @@
 export async function encodeIco(
   entries: { size: number; png: Blob }[],
 ): Promise<Blob> {
+  if (entries.some((e) => e.size > 256)) {
+    // ICONDIRENTRY dimensions are single bytes (0 encodes 256) — larger
+    // entries would silently mislabel the payload
+    throw new Error("ICO entries are limited to 256px");
+  }
   const buffers = await Promise.all(entries.map((e) => e.png.arrayBuffer()));
 
   const HEADER_BYTES = 6;

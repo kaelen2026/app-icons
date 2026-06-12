@@ -43,3 +43,6 @@ pool.txt
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+
+# local scratch
+pool.txt

@@ -45,7 +45,11 @@ export default function ImageUploader({ imageSrc, onImageChange }: Props) {
         type="file"
         accept={ACCEPTED_TYPES.join(",")}
         className="hidden"
-        onChange={(e) => handleFile(e.target.files?.[0])}
+        onChange={(e) => {
+          handleFile(e.target.files?.[0]);
+          // allow re-selecting the same file (change won't fire otherwise)
+          e.target.value = "";
+        }}
       />
       <button
         type="button"

@@ -20,9 +20,18 @@ export default function IconPreview({ config }: Props) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     let cancelled = false;
-    // drawIcon clears and repaints; guard against out-of-order async paints
-    drawIcon(ctx, config, LOGICAL_SIZE).then(() => {
+    // Paint offscreen first: drawIcon awaits image loads mid-draw, so painting
+    // the visible canvas directly would let an older config finish after a
+    // newer one and leave a stale foreground on screen.
+    const buffer = document.createElement("canvas");
+    buffer.width = LOGICAL_SIZE;
+    buffer.height = LOGICAL_SIZE;
+    const bufferCtx = buffer.getContext("2d");
+    if (!bufferCtx) return;
+    drawIcon(bufferCtx, config, LOGICAL_SIZE).then(() => {
       if (cancelled) return;
+      ctx.clearRect(0, 0, LOGICAL_SIZE, LOGICAL_SIZE);
+      ctx.drawImage(buffer, 0, 0);
     });
     return () => {
       cancelled = true;
