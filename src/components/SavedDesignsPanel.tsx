@@ -48,6 +48,7 @@ export default function SavedDesignsPanel({
               <button
                 type="button"
                 onClick={() => onRestore(design)}
+                aria-label={`restore ${design.name}`}
                 className="min-w-0 text-left"
                 title={`restore ${design.name}`}
               >
@@ -61,6 +62,7 @@ export default function SavedDesignsPanel({
               <button
                 type="button"
                 onClick={() => onDelete(design.id)}
+                aria-label={`delete ${design.name}`}
                 className="min-h-11 px-2 text-[11px] text-text-faint transition-colors hover:text-red-400 sm:min-h-0"
                 title={`delete ${design.name}`}
               >
