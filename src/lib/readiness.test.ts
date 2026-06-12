@@ -22,6 +22,28 @@ describe("getReadinessReport", () => {
     );
   });
 
+  it("returns issues for unknown platforms while reporting known registry entries", () => {
+    const report = getReadinessReport(defaultIconConfig, [
+      "ios",
+      "unknown-platform",
+    ]);
+
+    expect(report.status).toBe("issues");
+    expect(report.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "platform-selection",
+          severity: "issue",
+        }),
+        expect.objectContaining({
+          id: "registry-export-shape",
+          severity: "pass",
+          platformIds: ["ios"],
+        }),
+      ]),
+    );
+  });
+
   it("returns warnings without blocking when transform values risk safe zones", () => {
     const report = getReadinessReport(
       config({ scale: 95, offsetX: 18, rotation: 20 }),

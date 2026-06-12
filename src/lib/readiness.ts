@@ -25,13 +25,11 @@ const SAFE_ZONE_PLATFORM_IDS = new Set<PlatformId>([
 
 const CONTRAST_WARNING_THRESHOLD = 3;
 
-const platformIdSet = new Set<PlatformId>(
-  platforms.map((platform) => platform.id),
-);
+const platformIdSet = new Set<string>(platforms.map((platform) => platform.id));
 
 export function getReadinessReport(
   config: IconConfig,
-  selected: PlatformId[],
+  selected: readonly string[],
 ): ReadinessReport {
   const checks: ReadinessCheck[] = [];
   const knownSelected = selected.filter(isKnownPlatformId);
@@ -119,7 +117,7 @@ export function getReadinessReport(
   };
 }
 
-function isKnownPlatformId(platformId: PlatformId): platformId is PlatformId {
+function isKnownPlatformId(platformId: string): platformId is PlatformId {
   return platformIdSet.has(platformId);
 }
 
@@ -186,12 +184,16 @@ function contrastRatio(
 }
 
 function luminance(red: number, green: number, blue: number): number {
-  const [r, g, b] = [red, green, blue].map((channel) => {
-    const value = channel / 255;
-    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  });
+  const r = toLinear(red);
+  const g = toLinear(green);
+  const b = toLinear(blue);
 
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function toLinear(channel: number): number {
+  const value = channel / 255;
+  return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
 }
 
 function statusForChecks(checks: ReadinessCheck[]): ReadinessReport["status"] {
