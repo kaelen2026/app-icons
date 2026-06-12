@@ -789,4 +789,3 @@ Summarize:
 - export panel now shows inline readiness.
 - `IconStudio` passes live config and platform selection into the report.
 - exact verification commands run and their pass/fail status.
-
