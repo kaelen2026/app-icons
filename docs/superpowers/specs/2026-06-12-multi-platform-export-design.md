@@ -162,6 +162,25 @@ and surfaces through the existing export error state in `page.tsx`.
   README + config.
 - No test framework exists in the repo; none is added in this scope.
 
+## Addendum (2026-06-12): HarmonyOS platform
+
+Added on user request as a sixth platform, `id: "harmony"`, ordered after
+Android. Sources: Huawei layered-icon guidelines and AppGallery review
+requirements (1024×1024 layered PNG, no pre-rounded corners — the system
+applies its own mask; foreground content inside the 672px safe zone).
+
+**harmony/**
+- `AppScope/resources/base/media/foreground.png` — 1024, new variant
+  `harmonyForeground` (transparent bg, foreground scaled by 672/1024)
+- `AppScope/resources/base/media/background.png` — 1024, `adaptiveBackground`
+- `AppScope/resources/base/media/layered_image.json` — static;
+  `{"layered-image": {"background": "$media:background", "foreground": "$media:foreground"}}`,
+  referenced from `app.json5` as `"icon": "$media:layered_image"`
+- `start_window_icon.png` — 144, `masked` (for `startWindowIcon` in
+  `module.json5`)
+- `appgallery-icon.png` — 216, `fullBleed` (AppGallery requires square
+  corners, no transparency)
+
 ## Out of scope
 
 - `favicon.ico` (multi-resolution ICO encoding in-browser)
