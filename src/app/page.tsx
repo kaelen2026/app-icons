@@ -1,14 +1,14 @@
-"use client";
+import LandingContent from "@/components/LandingContent";
+import StudioLoader from "@/components/StudioLoader";
 
-import dynamic from "next/dynamic";
-
-// The editor is pure client state (canvas + localStorage). Skipping SSR lets
-// IconStudio read the stored design in its useState initializer, so the saved
-// design appears in the first paint with no hydration mismatch.
-const IconStudio = dynamic(() => import("@/components/IconStudio"), {
-  ssr: false,
-});
-
+// Server component: the studio itself is client-only (see StudioLoader), but
+// the page shell and LandingContent render on the server so crawlers get real
+// HTML without executing JS.
 export default function Home() {
-  return <IconStudio />;
+  return (
+    <>
+      <StudioLoader />
+      <LandingContent />
+    </>
+  );
 }

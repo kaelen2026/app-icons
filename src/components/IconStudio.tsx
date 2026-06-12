@@ -146,12 +146,12 @@ export default function IconStudio() {
   return (
     <div className="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-hairline px-5">
-        <h1 className="text-sm text-text">
+        <div className="text-sm text-text">
           app_icons{" "}
           <span className="text-[10px] text-text-faint">
             v0.1 · ios + android + web icon packs
           </span>
-        </h1>
+        </div>
         <div className="flex items-center gap-2">
           {importNote && (
             <span
