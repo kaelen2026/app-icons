@@ -18,6 +18,7 @@ import {
 import type { PlatformId } from "@/lib/exportPresets";
 import { allPlatformIds, exportFileList } from "@/lib/exportPresets";
 import { exportZip, zipFileName } from "@/lib/exportZip";
+import { randomStylePatch } from "@/lib/presets";
 import type { IconConfig } from "@/types/icon";
 import { defaultIconConfig } from "@/types/icon";
 
@@ -180,6 +181,14 @@ export default function IconStudio({
               e.target.value = "";
             }}
           />
+          <button
+            type="button"
+            onClick={() => update(randomStylePatch())}
+            title="random style: preset × icon × shape"
+            className="rounded-sm border border-hairline px-3 py-1.5 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97]"
+          >
+            random
+          </button>
           <button
             type="button"
             onClick={() => importInputRef.current?.click()}

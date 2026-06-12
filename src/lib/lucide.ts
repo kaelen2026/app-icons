@@ -6,6 +6,34 @@ const iconMap = icons as unknown as Record<string, IconNode>;
 
 export const lucideIconNames = Object.keys(iconMap);
 
+/** Curated subset shown in the picker's default grid and used by the randomizer. */
+export const popularIconNames = [
+  "Rocket",
+  "Zap",
+  "Star",
+  "Heart",
+  "Flame",
+  "Sparkles",
+  "Camera",
+  "Music",
+  "MessageCircle",
+  "ShoppingCart",
+  "Gamepad2",
+  "BookOpen",
+  "Cloud",
+  "Code",
+  "Compass",
+  "Globe",
+  "Leaf",
+  "Coffee",
+  "Dumbbell",
+  "Wallet",
+  "Bell",
+  "Calendar",
+  "MapPin",
+  "Send",
+];
+
 /** PascalCase → kebab-case for search/display ("ArrowRight" → "arrow-right") */
 export function toKebab(name: string): string {
   return name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();

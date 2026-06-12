@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { lucideIconNames, lucideSvgDataUrl, toKebab } from "@/lib/lucide";
+import {
+  lucideIconNames,
+  lucideSvgDataUrl,
+  popularIconNames,
+  toKebab,
+} from "@/lib/lucide";
 import type { ForegroundMode, IconConfig, TextFont } from "@/types/icon";
 import ImageUploader from "./ImageUploader";
 
@@ -17,33 +22,6 @@ const FONTS: { value: TextFont; label: string }[] = [
   { value: "mono", label: "mono" },
 ];
 
-const POPULAR_ICONS = [
-  "Rocket",
-  "Zap",
-  "Star",
-  "Heart",
-  "Flame",
-  "Sparkles",
-  "Camera",
-  "Music",
-  "MessageCircle",
-  "ShoppingCart",
-  "Gamepad2",
-  "BookOpen",
-  "Cloud",
-  "Code",
-  "Compass",
-  "Globe",
-  "Leaf",
-  "Coffee",
-  "Dumbbell",
-  "Wallet",
-  "Bell",
-  "Calendar",
-  "MapPin",
-  "Send",
-];
-
 const GRID_LIMIT = 24;
 
 type Props = {
@@ -56,7 +34,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
 
   const visibleIcons = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return POPULAR_ICONS;
+    if (!q) return popularIconNames;
     return lucideIconNames
       .filter((name) => toKebab(name).includes(q))
       .slice(0, GRID_LIMIT);
