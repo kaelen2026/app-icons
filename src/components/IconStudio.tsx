@@ -7,8 +7,10 @@ import BackgroundPanel from "@/components/BackgroundPanel";
 import ExportPanel from "@/components/ExportPanel";
 import ForegroundPanel from "@/components/ForegroundPanel";
 import IconPreview from "@/components/IconPreview";
+import SavedDesignsPanel from "@/components/SavedDesignsPanel";
 import ShapePanel from "@/components/ShapePanel";
 import TransformPanel from "@/components/TransformPanel";
+import VariationPanel from "@/components/VariationPanel";
 import {
   loadStoredConfig,
   parseIconConfig,
@@ -19,10 +21,21 @@ import type { PlatformId } from "@/lib/exportPresets";
 import { allPlatformIds, exportFileList } from "@/lib/exportPresets";
 import { exportZip, zipFileName } from "@/lib/exportZip";
 import { randomStylePatch } from "@/lib/presets";
+import {
+  createSavedDesign,
+  loadSavedDesigns,
+  type SavedDesign,
+  saveSavedDesigns,
+} from "@/lib/savedDesigns";
 import type { IconConfig } from "@/types/icon";
 import { defaultIconConfig } from "@/types/icon";
 
 const MARK_STAGGER_MS = 70;
+const HISTORY_LIMIT = 30;
+
+function sameConfig(a: IconConfig, b: IconConfig): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
 
 // Rendered with ssr:false (see StudioLoader), so localStorage is readable in
 // the lazy initializer and the stored design lands in the very first render.
@@ -33,6 +46,13 @@ export default function IconStudio({
 }) {
   const [config, setConfig] = useState<IconConfig>(
     () => loadStoredConfig() ?? defaultIconConfig,
+  );
+  const [history, setHistory] = useState<{
+    past: IconConfig[];
+    future: IconConfig[];
+  }>({ past: [], future: [] });
+  const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>(() =>
+    loadSavedDesigns(),
   );
   const [exporting, setExporting] = useState(false);
   const [completed, setCompleted] = useState<string[]>([]);
@@ -56,6 +76,10 @@ export default function IconStudio({
   }, [config]);
 
   useEffect(() => {
+    saveSavedDesigns(savedDesigns);
+  }, [savedDesigns]);
+
+  useEffect(() => {
     const timers = markTimers;
     return () => {
       timers.current.forEach(clearTimeout);
@@ -75,43 +99,97 @@ export default function IconStudio({
     setSelected(all ? allPlatformIds : []);
   }, []);
 
-  const update = useCallback((patch: Partial<IconConfig>) => {
-    setConfig((prev) => ({ ...prev, ...patch }));
-  }, []);
-
-  const handleReset = useCallback(() => {
-    setConfig(defaultIconConfig);
+  const commitConfig = useCallback((next: IconConfig | Partial<IconConfig>) => {
+    setConfig((prev) => {
+      const nextConfig =
+        "fgMode" in next && "appName" in next
+          ? (next as IconConfig)
+          : { ...prev, ...next };
+      if (sameConfig(prev, nextConfig)) return prev;
+      setHistory((current) => ({
+        past: [...current.past.slice(-(HISTORY_LIMIT - 1)), prev],
+        future: [],
+      }));
+      return nextConfig;
+    });
     setCompleted([]);
     setSaved(false);
     setImportNote(null);
   }, []);
 
-  const handleImportFile = useCallback(async (file: File | undefined) => {
-    if (!file) return;
-    try {
-      const data: unknown = JSON.parse(await file.text());
-      const parsed = parseIconConfig(data);
-      if (!parsed) throw new Error("not an icon config");
-      setConfig(parsed);
-      // exported icon-config.json also records the platform selection
-      const ids = parsePlatformIds(data);
-      if (ids) setSelected(ids);
-      setCompleted([]);
-      setSaved(false);
-      // exports strip the image data URL, so image-mode configs come back
-      // without their source image
-      setImportNote(
-        parsed.fgMode === "image" && !parsed.imageSrc
-          ? {
-              text: "config imported — re-upload the source image",
-              error: false,
-            }
-          : null,
-      );
-    } catch {
-      setImportNote({ text: "not a valid icon-config.json", error: true });
-    }
-  }, []);
+  const update = useCallback(
+    (patch: Partial<IconConfig>) => {
+      commitConfig(patch);
+    },
+    [commitConfig],
+  );
+
+  const undo = useCallback(() => {
+    setHistory((current) => {
+      if (current.past.length === 0) return current;
+      const previous = current.past[current.past.length - 1];
+      setConfig(previous);
+      return {
+        past: current.past.slice(0, -1),
+        future: [config, ...current.future].slice(0, HISTORY_LIMIT),
+      };
+    });
+  }, [config]);
+
+  const redo = useCallback(() => {
+    setHistory((current) => {
+      if (current.future.length === 0) return current;
+      const next = current.future[0];
+      setConfig(next);
+      return {
+        past: [...current.past.slice(-(HISTORY_LIMIT - 1)), config],
+        future: current.future.slice(1),
+      };
+    });
+  }, [config]);
+
+  const saveCurrentDesign = useCallback(() => {
+    setSavedDesigns((prev) =>
+      [createSavedDesign(config), ...prev].slice(0, 12),
+    );
+  }, [config]);
+
+  const handleReset = useCallback(() => {
+    commitConfig(defaultIconConfig);
+    setCompleted([]);
+    setSaved(false);
+    setImportNote(null);
+  }, [commitConfig]);
+
+  const handleImportFile = useCallback(
+    async (file: File | undefined) => {
+      if (!file) return;
+      try {
+        const data: unknown = JSON.parse(await file.text());
+        const parsed = parseIconConfig(data);
+        if (!parsed) throw new Error("not an icon config");
+        commitConfig(parsed);
+        // exported icon-config.json also records the platform selection
+        const ids = parsePlatformIds(data);
+        if (ids) setSelected(ids);
+        setCompleted([]);
+        setSaved(false);
+        // exports strip the image data URL, so image-mode configs come back
+        // without their source image
+        setImportNote(
+          parsed.fgMode === "image" && !parsed.imageSrc
+            ? {
+                text: "config imported — re-upload the source image",
+                error: false,
+              }
+            : null,
+        );
+      } catch {
+        setImportNote({ text: "not a valid icon-config.json", error: true });
+      }
+    },
+    [commitConfig],
+  );
 
   const handleDownload = useCallback(async () => {
     setExporting(true);
@@ -203,6 +281,24 @@ export default function IconStudio({
           </button>
           <button
             type="button"
+            onClick={undo}
+            disabled={history.past.length === 0}
+            title="undo last design change"
+            className="min-h-11 rounded-sm border border-hairline px-3 py-2 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            undo
+          </button>
+          <button
+            type="button"
+            onClick={redo}
+            disabled={history.future.length === 0}
+            title="redo design change"
+            className="min-h-11 rounded-sm border border-hairline px-3 py-2 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            redo
+          </button>
+          <button
+            type="button"
             onClick={() => importInputRef.current?.click()}
             title="restore a design from an exported icon-config.json"
             className="min-h-11 rounded-sm border border-hairline px-3 py-2 text-[11px] text-text-dim transition-all hover:border-hairline-bright hover:text-text active:scale-[0.97]"
@@ -231,6 +327,21 @@ export default function IconStudio({
         {/* left: controls */}
         <aside className="order-2 border-b border-hairline lg:order-none lg:overflow-y-auto lg:border-b-0 lg:border-r">
           <div className="divide-y divide-hairline">
+            <div className="p-5">
+              <VariationPanel config={config} onApply={commitConfig} />
+            </div>
+            <div className="p-5">
+              <SavedDesignsPanel
+                designs={savedDesigns}
+                onSave={saveCurrentDesign}
+                onRestore={(design) => commitConfig(design.config)}
+                onDelete={(id) =>
+                  setSavedDesigns((prev) =>
+                    prev.filter((design) => design.id !== id),
+                  )
+                }
+              />
+            </div>
             <div className="p-5">
               <ForegroundPanel config={config} onChange={update} />
             </div>
