@@ -2,33 +2,34 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import ExportPanel from "@/components/ExportPanel";
-import type { ReadinessReport } from "@/lib/readiness";
+import { platforms } from "@/lib/exportPresets";
+import type { ReadinessCheck, ReadinessReport } from "@/lib/readiness";
+
+const exportTargetsSelectedCheck = {
+  id: "platform-selection",
+  severity: "pass",
+  title: "Export targets selected",
+  detail: "All selected platforms are available in the export registry.",
+  platformIds: ["web"],
+} satisfies ReadinessCheck;
+
+const exportFilesRegisteredCheck = {
+  id: "registry-export-shape",
+  severity: "pass",
+  title: "Export files are registered",
+  detail: "The export registry has output files for the selected platforms.",
+  platformIds: ["web"],
+} satisfies ReadinessCheck;
 
 const readyReport = {
   status: "ready",
-  checks: [
-    {
-      id: "platform-selection",
-      severity: "pass",
-      title: "Export targets selected",
-      detail: "All selected platforms are available in the export registry.",
-      platformIds: ["web"],
-    },
-    {
-      id: "registry-export-shape",
-      severity: "pass",
-      title: "Export files are registered",
-      detail:
-        "The export registry has output files for the selected platforms.",
-      platformIds: ["web"],
-    },
-  ],
+  checks: [exportTargetsSelectedCheck, exportFilesRegisteredCheck],
 } satisfies ReadinessReport;
 
 const warningReport = {
   status: "warnings",
   checks: [
-    readyReport.checks[0],
+    exportTargetsSelectedCheck,
     {
       id: "small-text-legibility",
       severity: "warning",
@@ -37,7 +38,7 @@ const warningReport = {
         "Shorten text to three characters or fewer for tiny web favicon exports.",
       platformIds: ["web"],
     },
-    readyReport.checks[1],
+    exportFilesRegisteredCheck,
   ],
 } satisfies ReadinessReport;
 
@@ -104,14 +105,27 @@ describe("ExportPanel", () => {
   it("selects or clears every platform from the select-all control", async () => {
     const onSelectAll = vi.fn();
     const user = userEvent.setup();
+    const allPlatformIds = platforms.map((platform) => platform.id);
 
-    render(
+    const { rerender } = render(
       <ExportPanel {...baseProps} selected={[]} onSelectAll={onSelectAll} />,
     );
 
     await user.click(screen.getByRole("button", { name: "select all" }));
 
     expect(onSelectAll).toHaveBeenCalledWith(true);
+
+    rerender(
+      <ExportPanel
+        {...baseProps}
+        selected={allPlatformIds}
+        onSelectAll={onSelectAll}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "clear all" }));
+
+    expect(onSelectAll).toHaveBeenCalledWith(false);
   });
 
   it("renders warning readiness without disabling download", async () => {
