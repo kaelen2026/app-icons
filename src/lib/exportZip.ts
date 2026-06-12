@@ -2,7 +2,17 @@ import JSZip from "jszip";
 import type { IconConfig } from "@/types/icon";
 import type { Platform, PlatformId } from "./exportPresets";
 import { platforms } from "./exportPresets";
+import { encodeIco } from "./ico";
 import { renderIcon } from "./renderIcon";
+
+/** ZIP download name derived from the app name, e.g. "my-app-icons.zip". */
+export function zipFileName(config: IconConfig): string {
+  const slug = config.appName
+    .trim()
+    .replace(/[\\/:*?"<>|\s]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `${slug || "app"}-icons.zip`;
+}
 
 function buildReadme(config: IconConfig, selected: Platform[]): string {
   const name = config.appName.trim() || "App";
@@ -10,6 +20,9 @@ function buildReadme(config: IconConfig, selected: Platform[]): string {
   const fileLines = selected
     .flatMap((p) => [
       ...p.files.map((f) => `- \`${f.path}\` (${f.size}×${f.size})`),
+      ...(p.icoFiles ?? []).map(
+        (f) => `- \`${f.path}\` (${f.sizes.join("+")})`,
+      ),
       ...(p.staticFiles ?? []).map((f) => `- \`${f.path}\``),
     ])
     .join("\n");
@@ -41,6 +54,17 @@ export async function exportZip(
       const blob = await renderIcon(config, file.size, file.variant);
       zip.file(file.path, blob);
       onProgress?.(file.path);
+    }
+    for (const icoFile of platform.icoFiles ?? []) {
+      const entries = [];
+      for (const size of icoFile.sizes) {
+        entries.push({
+          size,
+          png: await renderIcon(config, size, icoFile.variant),
+        });
+      }
+      zip.file(icoFile.path, await encodeIco(entries));
+      onProgress?.(icoFile.path);
     }
     for (const staticFile of platform.staticFiles ?? []) {
       zip.file(staticFile.path, staticFile.content(config));

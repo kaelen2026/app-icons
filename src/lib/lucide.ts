@@ -22,20 +22,28 @@ function serializeChildren(node: IconNode): string {
     .join("");
 }
 
-export function buildLucideSvg(name: string, color: string): string | null {
+export function buildLucideSvg(
+  name: string,
+  color: string,
+  strokeWidth = 2,
+): string | null {
   const node = iconMap[name];
   if (!node) return null;
   // Rasterize at 512px for crisp canvas drawing; stroke units stay in the 24px viewBox
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 24 24" ` +
-    `fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
+    `fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round">` +
     serializeChildren(node) +
     `</svg>`
   );
 }
 
-export function lucideSvgDataUrl(name: string, color: string): string | null {
-  const svg = buildLucideSvg(name, color);
+export function lucideSvgDataUrl(
+  name: string,
+  color: string,
+  strokeWidth = 2,
+): string | null {
+  const svg = buildLucideSvg(name, color, strokeWidth);
   if (!svg) return null;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }

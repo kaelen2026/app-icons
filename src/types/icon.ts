@@ -4,6 +4,8 @@ export type ForegroundMode = "image" | "text" | "icon";
 
 export type TextFont = "sans" | "serif" | "mono";
 
+export type BgType = "solid" | "linear" | "radial";
+
 export type IconConfig = {
   fgMode: ForegroundMode;
   imageSrc: string | null;
@@ -12,8 +14,12 @@ export type IconConfig = {
   textFont: TextFont;
   iconName: string;
   iconColor: string;
+  /** Lucide stroke width in the 24px viewBox (lucide's default is 2). */
+  iconStroke: number;
   appName: string;
-  bgType: "solid" | "linear";
+  bgType: BgType;
+  /** Linear gradient direction, CSS convention: 0° = up, clockwise. */
+  bgAngle: number;
   bgColor1: string;
   bgColor2: string;
   shape: IconShape;
@@ -31,8 +37,10 @@ export const defaultIconConfig: IconConfig = {
   textFont: "mono",
   iconName: "Rocket",
   iconColor: "#4ade80",
+  iconStroke: 2,
   appName: "my-app",
   bgType: "linear",
+  bgAngle: 135, // matches the old fixed top-left → bottom-right diagonal
   bgColor1: "#1a1a1f",
   bgColor2: "#2e2e36",
   shape: "rounded",

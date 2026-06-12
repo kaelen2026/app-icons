@@ -13,6 +13,7 @@ type Props = {
   completed: string[];
   saved: boolean;
   selected: PlatformId[];
+  zipName: string;
   onToggle: (id: PlatformId) => void;
   onDownload: () => void;
 };
@@ -55,6 +56,7 @@ export default function ExportPanel({
   completed,
   saved,
   selected,
+  zipName,
   onToggle,
   onDownload,
 }: Props) {
@@ -70,7 +72,9 @@ export default function ExportPanel({
         {platforms.map((platform) => {
           const checked = selected.includes(platform.id);
           const count =
-            platform.files.length + (platform.staticFiles?.length ?? 0);
+            platform.files.length +
+            (platform.icoFiles?.length ?? 0) +
+            (platform.staticFiles?.length ?? 0);
           return (
             <li key={platform.id}>
               <label className="flex cursor-pointer items-baseline gap-2 text-[11px]">
@@ -103,6 +107,7 @@ export default function ExportPanel({
           .map((platform) => {
             const paths = [
               ...platform.files.map((f) => f.path),
+              ...(platform.icoFiles ?? []).map((f) => f.path),
               ...(platform.staticFiles ?? []).map((f) => f.path),
             ];
             return (
@@ -137,7 +142,7 @@ export default function ExportPanel({
 
       <p className="border-t border-hairline pt-3 text-[11px] text-text-faint">
         {saved ? (
-          <span className="text-accent">app-icons.zip ✓ saved</span>
+          <span className="text-accent">{zipName} ✓ saved</span>
         ) : exporting ? (
           `rendering ${completed.length}/${fileList.length}…`
         ) : none ? (

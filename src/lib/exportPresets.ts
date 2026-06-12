@@ -7,11 +7,19 @@ export type PlatformId =
   | "harmony"
   | "web"
   | "webapp"
-  | "expo";
+  | "expo"
+  | "desktop";
 
 export type PlatformFile = {
   path: string;
   size: number;
+  variant: RenderVariant;
+};
+
+/** A multi-resolution .ico bundling one render per size. */
+export type IcoFile = {
+  path: string;
+  sizes: number[];
   variant: RenderVariant;
 };
 
@@ -25,6 +33,7 @@ export type Platform = {
   label: string;
   description: string;
   files: PlatformFile[];
+  icoFiles?: IcoFile[];
   staticFiles?: StaticFile[];
   readmeSection: (config: IconConfig) => string;
 };
@@ -37,6 +46,20 @@ const DENSITIES: [string, number][] = [
   ["xxhdpi", 3],
   ["xxxhdpi", 4],
 ];
+
+// Apple's iconutil naming: each point size ships a 1x and a @2x pixel render
+const macosIconset: PlatformFile[] = [16, 32, 128, 256, 512].flatMap((pt) => [
+  {
+    path: `desktop/macos/AppIcon.iconset/icon_${pt}x${pt}.png`,
+    size: pt,
+    variant: "masked" as const,
+  },
+  {
+    path: `desktop/macos/AppIcon.iconset/icon_${pt}x${pt}@2x.png`,
+    size: pt * 2,
+    variant: "masked" as const,
+  },
+]);
 
 function androidMipmaps(
   name: string,
@@ -81,6 +104,7 @@ const icLauncherXml = `<?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@mipmap/ic_launcher_background"/>
     <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+    <monochrome android:drawable="@mipmap/ic_launcher_monochrome"/>
 </adaptive-icon>
 `;
 
@@ -154,6 +178,7 @@ corner mask.`,
       ...androidMipmaps("ic_launcher", 48, "masked"),
       ...androidMipmaps("ic_launcher_foreground", 108, "adaptiveForeground"),
       ...androidMipmaps("ic_launcher_background", 108, "adaptiveBackground"),
+      ...androidMipmaps("ic_launcher_monochrome", 108, "monochrome"),
       { path: "android/play-store-icon.png", size: 512, variant: "fullBleed" },
     ],
     staticFiles: [
@@ -166,7 +191,9 @@ corner mask.`,
 
 Copy the \`android/res/\` folders into your module's \`src/main/res/\`. Android 8+
 uses the adaptive layers via \`mipmap-anydpi-v26/ic_launcher.xml\`; older versions
-fall back to the legacy \`ic_launcher.png\`. Upload \`play-store-icon.png\`
+fall back to the legacy \`ic_launcher.png\`. The \`ic_launcher_monochrome\` layer
+enables Android 13+ themed icons (the launcher tints its alpha mask); systems
+below 13 ignore the \`<monochrome>\` tag. Upload \`play-store-icon.png\`
 (512×512, no transparency) in the Play Console.`,
   },
   {
@@ -225,9 +252,14 @@ square corners) in AppGallery Connect.`,
       { path: "web/favicon-32x32.png", size: 32, variant: "masked" },
       { path: "web/apple-touch-icon.png", size: 180, variant: "fullBleed" },
     ],
+    icoFiles: [
+      { path: "web/favicon.ico", sizes: [16, 32, 48], variant: "masked" },
+    ],
     readmeSection: () => `## Web
 
-Copy the \`web/\` files into your \`public/\` folder:
+Copy the \`web/\` files into your \`public/\` folder. \`favicon.ico\` (16+32+48)
+is picked up automatically from the site root; the \`<link>\` tags cover the
+rest:
 
 \`\`\`html
 <link rel="icon" sizes="32x32" href="/favicon-32x32.png" />
@@ -289,6 +321,35 @@ in \`app.json\`:
 }
 \`\`\``,
   },
+  {
+    id: "desktop",
+    label: "Desktop",
+    description: "macOS iconset + Windows ICO",
+    files: [
+      ...macosIconset,
+      { path: "desktop/icon-1024.png", size: 1024, variant: "masked" },
+    ],
+    icoFiles: [
+      {
+        path: "desktop/windows/icon.ico",
+        sizes: [16, 24, 32, 48, 64, 128, 256],
+        variant: "masked",
+      },
+    ],
+    readmeSection: () => `## Desktop
+
+macOS — convert the iconset into an \`.icns\` (run on macOS):
+
+\`\`\`sh
+iconutil -c icns desktop/macos/AppIcon.iconset
+\`\`\`
+
+Windows — \`desktop/windows/icon.ico\` bundles 16–256 px PNG entries.
+
+Electron (electron-builder): point \`mac.icon\` at the generated \`.icns\` and
+\`win.icon\` at \`icon.ico\`. Tauri: regenerate every target from the master
+image with \`npx tauri icon desktop/icon-1024.png\`.`,
+  },
 ];
 
 export const allPlatformIds: PlatformId[] = platforms.map((p) => p.id);
@@ -301,6 +362,7 @@ export function exportFileList(selected: PlatformId[]): string[] {
   for (const platform of platforms) {
     if (!selected.includes(platform.id)) continue;
     paths.push(...platform.files.map((f) => f.path));
+    paths.push(...(platform.icoFiles ?? []).map((f) => f.path));
     paths.push(...(platform.staticFiles ?? []).map((f) => f.path));
   }
   paths.push(...extraExportFiles);

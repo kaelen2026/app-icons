@@ -25,12 +25,14 @@ export default function ImageUploader({ imageSrc, onImageChange }: Props) {
       return;
     }
     setError(null);
-    if (imageSrc?.startsWith("blob:")) URL.revokeObjectURL(imageSrc);
-    onImageChange(URL.createObjectURL(file));
+    // Data URL (not a blob URL) so the design survives reload via localStorage
+    const reader = new FileReader();
+    reader.onload = () => onImageChange(reader.result as string);
+    reader.onerror = () => setError("could not read file. retry.");
+    reader.readAsDataURL(file);
   }
 
   function handleRemove() {
-    if (imageSrc?.startsWith("blob:")) URL.revokeObjectURL(imageSrc);
     if (inputRef.current) inputRef.current.value = "";
     setError(null);
     onImageChange(null);

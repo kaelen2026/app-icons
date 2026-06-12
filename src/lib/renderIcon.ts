@@ -7,13 +7,16 @@ export type RenderVariant =
   | "adaptiveForeground" // transparent bg, foreground in the Android 66/108dp safe zone
   | "adaptiveBackground" // background layer only, full bleed
   | "maskable" // full bleed, foreground in the PWA 80% safe zone
-  | "harmonyForeground"; // transparent bg, foreground in the HarmonyOS 672/1024px safe zone
+  | "harmonyForeground" // transparent bg, foreground in the HarmonyOS 672/1024px safe zone
+  | "monochrome"; // alpha-only foreground for Android 13+ themed icons — the launcher tints it
 
 type VariantSpec = {
   clip: boolean;
   background: boolean;
   foreground: boolean;
   fgScale: number;
+  /** Flatten the drawn foreground to a white alpha mask. */
+  monochrome?: boolean;
 };
 
 const VARIANTS: Record<RenderVariant, VariantSpec> = {
@@ -37,6 +40,13 @@ const VARIANTS: Record<RenderVariant, VariantSpec> = {
     background: false,
     foreground: true,
     fgScale: 672 / 1024,
+  },
+  monochrome: {
+    clip: false,
+    background: false,
+    foreground: true,
+    fgScale: 66 / 108,
+    monochrome: true,
   },
 };
 
@@ -102,8 +112,33 @@ function drawBackground(
   config: IconConfig,
   size: number,
 ) {
+  const half = size / 2;
   if (config.bgType === "linear") {
-    const gradient = ctx.createLinearGradient(0, 0, size, size);
+    // CSS angle convention: 0° points up, increasing clockwise
+    const rad = (config.bgAngle * Math.PI) / 180;
+    const dx = Math.sin(rad);
+    const dy = -Math.cos(rad);
+    // extend the axis so the gradient spans the full square at any angle
+    const ext = half * (Math.abs(dx) + Math.abs(dy));
+    const gradient = ctx.createLinearGradient(
+      half - dx * ext,
+      half - dy * ext,
+      half + dx * ext,
+      half + dy * ext,
+    );
+    gradient.addColorStop(0, config.bgColor1);
+    gradient.addColorStop(1, config.bgColor2);
+    ctx.fillStyle = gradient;
+  } else if (config.bgType === "radial") {
+    // center → corners so color_2 fully reaches the square's corners
+    const gradient = ctx.createRadialGradient(
+      half,
+      half,
+      0,
+      half,
+      half,
+      half * Math.SQRT2,
+    );
     gradient.addColorStop(0, config.bgColor1);
     gradient.addColorStop(1, config.bgColor2);
     ctx.fillStyle = gradient;
@@ -200,7 +235,11 @@ async function drawForeground(
   if (config.fgMode === "image") {
     src = config.imageSrc;
   } else {
-    src = lucideSvgDataUrl(config.iconName, config.iconColor);
+    src = lucideSvgDataUrl(
+      config.iconName,
+      config.iconColor,
+      config.iconStroke,
+    );
   }
   if (!src) return;
 
@@ -242,6 +281,13 @@ export async function drawIcon(
             offsetY: config.offsetY * spec.fgScale,
           };
     await drawForeground(ctx, fgConfig, size);
+    if (spec.monochrome) {
+      // source-in keeps only the foreground's alpha and paints it white;
+      // composite mode is reverted by the restore below
+      ctx.globalCompositeOperation = "source-in";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, size, size);
+    }
   }
   ctx.restore();
 }

@@ -182,6 +182,23 @@ export default function ForegroundPanel({ config, onChange }: Props) {
               })}
             </div>
           )}
+          <label className="block space-y-1">
+            <span className="flex justify-between text-[11px] text-text-dim">
+              <span>stroke</span>
+              <span className="tabular-nums text-accent">
+                {config.iconStroke}
+              </span>
+            </span>
+            <input
+              type="range"
+              min={1}
+              max={3}
+              step={0.25}
+              value={config.iconStroke}
+              onChange={(e) => onChange({ iconStroke: Number(e.target.value) })}
+              className="w-full"
+            />
+          </label>
           <p className="text-[10px] text-text-faint">
             selected:{" "}
             <span className="text-accent">{toKebab(config.iconName)}</span>
