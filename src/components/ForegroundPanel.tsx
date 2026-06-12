@@ -79,7 +79,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
               key={mode.value}
               type="button"
               onClick={() => onChange({ fgMode: mode.value })}
-              className={`px-3 py-1.5 text-[11px] transition-colors ${
+              className={`px-2 py-1.5 text-[11px] whitespace-nowrap transition-colors ${
                 active
                   ? "bg-panel-2 text-accent"
                   : "bg-ink text-text-dim hover:text-text"
