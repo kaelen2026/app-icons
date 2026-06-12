@@ -6,7 +6,7 @@ import { lucideIconNames } from "./lucide";
 
 const STORAGE_KEY = "app-icons:config";
 
-const FG_MODES = ["image", "text", "icon"] as const;
+const FG_MODES = ["image", "text", "icon", "emoji"] as const;
 const FONTS = ["sans", "serif", "mono"] as const;
 const BG_TYPES = ["solid", "linear", "radial"] as const;
 const SHAPES = ["rounded", "circle", "squircle", "square"] as const;
@@ -69,6 +69,8 @@ export function parseIconConfig(data: unknown): IconConfig | null {
         : def.iconName,
     iconColor: pickColor(d.iconColor, def.iconColor),
     iconStroke: pickNumber(d.iconStroke, 1, 3, def.iconStroke),
+    // a single emoji can be several code points (ZWJ sequences, flags)
+    emoji: pickString(d.emoji, def.emoji).slice(0, 16),
     appName: pickString(d.appName, def.appName),
     bgType: pickEnum(d.bgType, BG_TYPES, def.bgType),
     bgAngle: pickNumber(d.bgAngle, 0, 360, def.bgAngle),

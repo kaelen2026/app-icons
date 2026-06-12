@@ -14,6 +14,34 @@ const MODES: { value: ForegroundMode; label: string }[] = [
   { value: "image", label: "image" },
   { value: "text", label: "text" },
   { value: "icon", label: "icon" },
+  { value: "emoji", label: "emoji" },
+];
+
+const POPULAR_EMOJI = [
+  "🚀",
+  "⚡",
+  "🔥",
+  "✨",
+  "💎",
+  "🎯",
+  "🎨",
+  "🎮",
+  "🎵",
+  "📷",
+  "💬",
+  "🛒",
+  "📚",
+  "☁️",
+  "🌍",
+  "🌙",
+  "☀️",
+  "🌈",
+  "🍀",
+  "☕",
+  "💪",
+  "🧠",
+  "🤖",
+  "👾",
 ];
 
 const FONTS: { value: TextFont; label: string }[] = [
@@ -43,7 +71,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
   return (
     <section className="space-y-3">
       <h2 className="text-[11px] tracking-[0.18em] text-text-faint">fg_mode</h2>
-      <div className="grid grid-cols-3 gap-px border border-hairline bg-hairline">
+      <div className="grid grid-cols-4 gap-px border border-hairline bg-hairline">
         {MODES.map((mode) => {
           const active = config.fgMode === mode.value;
           return (
@@ -107,6 +135,41 @@ export default function ForegroundPanel({ config, onChange }: Props) {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {config.fgMode === "emoji" && (
+        <div className="space-y-3">
+          <div className="grid grid-cols-6 gap-1">
+            {POPULAR_EMOJI.map((emoji) => {
+              const active = config.emoji === emoji;
+              return (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => onChange({ emoji })}
+                  className={`flex aspect-square items-center justify-center rounded-sm border text-base transition-colors ${
+                    active
+                      ? "border-accent bg-accent-dim"
+                      : "border-hairline hover:border-hairline-bright"
+                  }`}
+                >
+                  {emoji}
+                </button>
+              );
+            })}
+          </div>
+          <input
+            type="text"
+            value={config.emoji}
+            maxLength={16}
+            onChange={(e) => onChange({ emoji: e.target.value })}
+            placeholder="or paste any emoji"
+            className="w-full rounded-sm border border-hairline bg-panel-2 px-3 py-2 text-sm text-text outline-none transition-colors focus:border-accent"
+          />
+          <p className="text-[10px] text-text-faint">
+            rendered with your OS emoji font — exact style varies by platform
+          </p>
         </div>
       )}
 

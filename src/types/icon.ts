@@ -1,6 +1,6 @@
 export type IconShape = "rounded" | "circle" | "squircle" | "square";
 
-export type ForegroundMode = "image" | "text" | "icon";
+export type ForegroundMode = "image" | "text" | "icon" | "emoji";
 
 export type TextFont = "sans" | "serif" | "mono";
 
@@ -16,6 +16,8 @@ export type IconConfig = {
   iconColor: string;
   /** Lucide stroke width in the 24px viewBox (lucide's default is 2). */
   iconStroke: number;
+  /** Emoji foreground; rendered with the OS emoji font, so color is built in. */
+  emoji: string;
   appName: string;
   bgType: BgType;
   /** Linear gradient direction, CSS convention: 0° = up, clockwise. */
@@ -38,6 +40,7 @@ export const defaultIconConfig: IconConfig = {
   iconName: "Rocket",
   iconColor: "#4ade80",
   iconStroke: 2,
+  emoji: "🚀",
   appName: "my-app",
   bgType: "linear",
   bgAngle: 135, // matches the old fixed top-left → bottom-right diagonal

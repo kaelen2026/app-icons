@@ -233,6 +233,38 @@ function drawTextForeground(
   ctx.restore();
 }
 
+const EMOJI_FONT_STACK =
+  "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif";
+
+function drawEmojiForeground(
+  ctx: CanvasRenderingContext2D,
+  config: IconConfig,
+  size: number,
+) {
+  const emoji = config.emoji.trim();
+  if (!emoji) return;
+  const target = (config.scale / 100) * size;
+
+  // Emoji glyphs are roughly square; shrink only if measurement says otherwise
+  let fontSize = target;
+  ctx.font = `${fontSize}px ${EMOJI_FONT_STACK}`;
+  const width = ctx.measureText(emoji).width;
+  if (width > target) {
+    fontSize *= target / width;
+  }
+
+  ctx.save();
+  applyTransform(ctx, config, size);
+  ctx.font = `${fontSize}px ${EMOJI_FONT_STACK}`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  const metrics = ctx.measureText(emoji);
+  const yOffset =
+    (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2;
+  ctx.fillText(emoji, 0, yOffset);
+  ctx.restore();
+}
+
 async function drawForeground(
   ctx: CanvasRenderingContext2D,
   config: IconConfig,
@@ -240,6 +272,10 @@ async function drawForeground(
 ) {
   if (config.fgMode === "text") {
     drawTextForeground(ctx, config, size);
+    return;
+  }
+  if (config.fgMode === "emoji") {
+    drawEmojiForeground(ctx, config, size);
     return;
   }
 
