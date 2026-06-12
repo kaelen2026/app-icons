@@ -36,7 +36,19 @@ The release gate is:
 pnpm test && pnpm lint && pnpm typecheck && pnpm build
 ```
 
+The full local quality gate is:
+
+```sh
+pnpm quality
+```
+
+It runs coverage thresholds, repository hygiene checks, design constraints,
+Markdown lint, secret scanning, ESLint, Biome, dead-code detection, typecheck,
+and production build. See `docs/quality.md` for the full local quality tool
+map.
+
 Run `pnpm test` before the release gate when changing app behavior. Run
 `pnpm test:e2e` when changing routing, export/download behavior, canvas
 rendering, or responsive layout. Run `pnpm test:e2e:prod` after `pnpm build`
-before release or deploy.
+before release or deploy. Run `pnpm audit:deps` before release and dependency
+updates.

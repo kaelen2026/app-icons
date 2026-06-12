@@ -7,23 +7,33 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Commands
 
 ```sh
-pnpm dev        # dev server at localhost:3000
-pnpm lint       # eslint . && biome check .
-pnpm format     # biome check --write . (format + safe lint fixes)
-pnpm typecheck  # tsc --noEmit
-pnpm build      # next build
+pnpm dev             # dev server at localhost:3000
+pnpm lint            # repo hygiene + design + Markdown + secrets + ESLint + Biome
+pnpm lint:dead-code  # Knip unused files/exports/dependencies check
+pnpm audit:deps      # dependency vulnerability audit
+pnpm quality         # coverage + lint + dead-code + typecheck + build
+pnpm format          # biome check --write . (format + safe lint fixes)
+pnpm typecheck       # tsc --noEmit
+pnpm build           # next build
 ```
 
 ## Verification
 
-The verification gate after code changes is:
+The baseline verification gate after code changes is:
 
 ```sh
 pnpm test && pnpm lint && pnpm typecheck && pnpm build
 ```
 
-For UI or export-flow changes, also run `pnpm test:e2e`. For coverage-sensitive
-test work, run `pnpm test:coverage`.
+The full local quality gate is:
+
+```sh
+pnpm quality
+```
+
+Run `pnpm audit:deps` before release and dependency updates. For UI or
+export-flow changes, also run `pnpm test:e2e`. For production smoke testing
+after `pnpm build`, run `pnpm test:e2e:prod`.
 
 Git hooks (husky) enforce this on commit: pre-commit runs lint-staged (Biome + ESLint on staged files), commit-msg runs commitlint — commit messages must follow Conventional Commits (`feat: ...`, `fix: ...`, etc.). Formatting is Biome (2-space indent, double quotes), configured in `biome.json`.
 

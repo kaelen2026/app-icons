@@ -6,8 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "pnpm lint:design && eslint . && biome check .",
+    "lint": "pnpm lint:repo && pnpm lint:design && pnpm lint:md && pnpm lint:secrets && eslint . && biome check .",
+    "lint:repo": "node scripts/lint-repo.mjs",
     "lint:design": "node scripts/lint-design.mjs",
+    "lint:md": "markdownlint-cli2 \"**/*.md\"",
+    "lint:secrets": "secretlint \"**/*\"",
+    "lint:dead-code": "knip",
+    "quality": "pnpm test:coverage && pnpm lint && pnpm lint:dead-code && pnpm typecheck && pnpm build",
+    "audit:deps": "pnpm audit --audit-level moderate",
+    "deps:outdated": "pnpm outdated",
     "format": "biome check --write .",
     "test": "vitest run",
     "test:e2e": "playwright test",
@@ -31,6 +38,11 @@
       "biome check --write --no-errors-on-unmatched"
     ]
   },
+  "pnpm": {
+    "overrides": {
+      "postcss": "8.5.15"
+    }
+  },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "file-saver": "^2.0.5",
@@ -45,6 +57,7 @@
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "@playwright/test": "^1.60.0",
+    "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -58,7 +71,10 @@
     "eslint-config-next": "16.2.9",
     "happy-dom": "^20.10.2",
     "husky": "^9.1.7",
+    "knip": "^6.16.1",
     "lint-staged": "^17.0.7",
+    "markdownlint-cli2": "^0.22.1",
+    "secretlint": "^13.0.2",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.8"

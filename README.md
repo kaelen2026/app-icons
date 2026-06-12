@@ -19,10 +19,16 @@ Open [http://localhost:3000/favicon-generator](http://localhost:3000/favicon-gen
 
 ## Quality Gates
 
-Local release gate:
+Baseline local gate:
 
 ```sh
 pnpm test && pnpm lint && pnpm typecheck && pnpm build
+```
+
+Full local quality gate:
+
+```sh
+pnpm quality
 ```
 
 Additional gates:
@@ -32,10 +38,15 @@ pnpm test:coverage      # unit + component coverage thresholds
 pnpm test:e2e           # browser smoke tests against dev server
 pnpm build
 pnpm test:e2e:prod      # browser smoke tests against production server
+pnpm lint:dead-code     # unused files, exports, and dependencies
+pnpm audit:deps         # dependency vulnerability audit
+pnpm quality            # full local quality gate
 ```
 
-GitHub Actions runs tests, design lint, ESLint, Biome, typecheck, build,
-coverage, and production E2E on pull requests and pushes to `main`.
+`pnpm lint` runs repository hygiene checks, design constraints, Markdown lint,
+secret scanning, ESLint, and Biome. GitHub Actions runs tests, design lint,
+ESLint, Biome, typecheck, build, coverage, and production E2E on pull requests
+and pushes to `main` once the repository is hosted.
 
 ## Architecture
 
@@ -76,8 +87,8 @@ decorative marketing patterns.
 Before production deploy:
 
 ```sh
-pnpm test:coverage
-pnpm test && pnpm lint && pnpm typecheck && pnpm build
+pnpm audit:deps
+pnpm quality
 pnpm test:e2e:prod
 ```
 

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/app/**/*.{ts,tsx}",
+    "src/components/**/*.test.tsx",
+    "src/lib/**/*.test.ts",
+    "e2e/**/*.ts",
+    "scripts/*.mjs",
+    "*.config.{js,mjs,ts}"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "e2e/**/*.ts",
+    "scripts/*.mjs",
+    "*.config.{js,mjs,ts}"
+  ],
+  "ignoreIssues": {
+    "src/lib/exportPresets.ts": ["types"],
+    "src/types/icon.ts": ["types"]
+  },
+  "ignoreDependencies": [
+    "@secretlint/secretlint-rule-preset-recommend",
+    "tailwindcss"
+  ]
+}

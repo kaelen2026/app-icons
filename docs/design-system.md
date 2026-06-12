@@ -152,7 +152,7 @@ pnpm lint:design
 pnpm test:component
 pnpm test:e2e
 pnpm test:e2e:prod
-pnpm lint && pnpm typecheck && pnpm build
+pnpm quality
 ```
 
 Run `pnpm test:coverage` when adding or changing tested component behavior.
