@@ -26,17 +26,17 @@ pnpm test:watch      # local watch mode
 
 Coverage uses Vitest's V8 provider and reports `text`, `html`, and `lcov`.
 Unit reports are written to `coverage/unit/`; component reports are written to
-`coverage/components/`. The current enforced threshold for the unit layer is
-70% for statements, branches, functions, and lines. Component coverage is
-reported separately without a hard threshold until the component test surface is
-broader.
+`coverage/components/`. The unit layer enforces 70% for statements, branches,
+functions, and lines. The component layer enforces 80% for statements, branches,
+functions, and lines.
 
-The release gate remains:
+The release gate is:
 
 ```sh
-pnpm lint && pnpm typecheck && pnpm build
+pnpm test && pnpm lint && pnpm typecheck && pnpm build
 ```
 
 Run `pnpm test` before the release gate when changing app behavior. Run
 `pnpm test:e2e` when changing routing, export/download behavior, canvas
-rendering, or responsive layout.
+rendering, or responsive layout. Run `pnpm test:e2e:prod` after `pnpm build`
+before release or deploy.

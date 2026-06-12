@@ -151,6 +151,7 @@ For UI changes, run:
 pnpm lint:design
 pnpm test:component
 pnpm test:e2e
+pnpm test:e2e:prod
 pnpm lint && pnpm typecheck && pnpm build
 ```
 

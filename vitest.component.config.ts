@@ -14,6 +14,12 @@ export default defineConfig({
       reportsDirectory: "./coverage/components",
       include: ["src/components/**/*.tsx"],
       exclude: ["src/**/*.test.{ts,tsx}"],
+      thresholds: {
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80,
+      },
     },
     environment: "happy-dom",
     include: ["src/components/**/*.test.tsx"],

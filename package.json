@@ -11,6 +11,7 @@
     "format": "biome check --write .",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:prod": "playwright test --config playwright.prod.config.ts",
     "test:coverage": "pnpm test:unit:coverage && pnpm test:component:coverage",
     "test:watch": "vitest",
     "test:unit": "vitest run src/lib",
@@ -22,6 +23,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [
+      "node scripts/lint-design.mjs",
       "biome check --write --no-errors-on-unmatched",
       "eslint --fix --max-warnings=0"
     ],

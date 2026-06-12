@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# App Icons
 
-## Getting Started
+Browser-only app icon generator for iOS, Android, HarmonyOS, web/PWA, Expo, and
+desktop icon packs.
 
-First, run the development server:
+The app composes a foreground (image upload, text, emoji, or Lucide icon) over a
+background and shape, previews the result live with Canvas, and exports a
+multi-platform ZIP entirely in the browser. There is no backend, database, auth,
+or upload path.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
+## Development
+
+```sh
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000/favicon-generator](http://localhost:3000/favicon-generator).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Quality Gates
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Local release gate:
 
-## Learn More
+```sh
+pnpm test && pnpm lint && pnpm typecheck && pnpm build
+```
 
-To learn more about Next.js, take a look at the following resources:
+Additional gates:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sh
+pnpm test:coverage      # unit + component coverage thresholds
+pnpm test:e2e           # browser smoke tests against dev server
+pnpm build
+pnpm test:e2e:prod      # browser smoke tests against production server
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+GitHub Actions runs tests, design lint, ESLint, Biome, typecheck, build,
+coverage, and production E2E on pull requests and pushes to `main`.
 
-## Deploy on Vercel
+## Architecture
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/types/icon.ts`: `IconConfig`, the single source of design state.
+- `src/components/IconStudio.tsx`: owns config state, history, persistence,
+  saved designs, import/export status, and panel composition.
+- `src/lib/renderIcon.ts`: shared Canvas renderer for live preview and offscreen
+  export rendering.
+- `src/lib/exportPresets.ts`: declarative platform registry. Export panel file
+  lists, ZIP contents, README sections, and platform metadata derive from it.
+- `src/lib/exportZip.ts`: renders selected platform assets and packages the ZIP
+  with JSZip.
+- `src/lib/configStorage.ts`: localStorage persistence and imported
+  `icon-config.json` sanitization.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Testing
+
+See [docs/testing.md](docs/testing.md).
+
+Current layers:
+
+- Unit: Vitest over pure logic in `src/lib`
+- Component: Vitest + Testing Library + `happy-dom`
+- E2E: Playwright desktop and mobile browser smoke tests
+- Coverage: V8 provider with separate unit/component reports
+
+## Design System
+
+See [docs/design-system.md](docs/design-system.md).
+
+Core UI constraints are enforced by `pnpm lint:design` and included in
+`pnpm lint`. New UI should use semantic tokens from `src/app/globals.css`, keep
+the dense terminal-studio style, preserve mobile ergonomics, and avoid
+decorative marketing patterns.
+
+## Deployment
+
+Before production deploy:
+
+```sh
+pnpm test:coverage
+pnpm test && pnpm lint && pnpm typecheck && pnpm build
+pnpm test:e2e:prod
+```
+
+The app is static/SSG-compatible and is currently deployed on Vercel.
