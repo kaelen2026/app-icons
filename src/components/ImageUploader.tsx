@@ -45,8 +45,9 @@ export default function ImageUploader({ imageSrc, onImageChange }: Props) {
         className="hidden"
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
-      <div
-        className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-hairline px-4 py-6 text-center transition-colors hover:border-hairline-bright hover:bg-panel-2"
+      <button
+        type="button"
+        className="flex w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-hairline px-4 py-6 text-center transition-colors hover:border-hairline-bright hover:bg-panel-2"
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
@@ -60,7 +61,7 @@ export default function ImageUploader({ imageSrc, onImageChange }: Props) {
         <span className="text-[10px] text-text-faint">
           png · jpg · webp · svg
         </span>
-      </div>
+      </button>
       {error && <p className="text-[11px] text-red-400">{error}</p>}
       {imageSrc && (
         <button

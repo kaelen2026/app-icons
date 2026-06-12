@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { IconConfig } from "@/types/icon";
 import { renderIconDataUrl } from "@/lib/renderIcon";
+import type { IconConfig } from "@/types/icon";
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -123,9 +123,7 @@ export default function PreviewWall({ config }: Props) {
             <img src={shapedSrc} alt="" className="h-8 w-8 shrink-0" />
           )}
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-[10px] text-text">
-              {name}
-            </span>
+            <span className="block truncate text-[10px] text-text">{name}</span>
             <span className="block text-[9px] text-text-faint">
               localhost:3000
             </span>

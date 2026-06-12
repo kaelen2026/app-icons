@@ -1,18 +1,18 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
 import { saveAs } from "file-saver";
-import type { IconConfig } from "@/types/icon";
-import { defaultIconConfig } from "@/types/icon";
-import { exportZip } from "@/lib/exportZip";
-import type { PlatformId } from "@/lib/exportPresets";
-import { allPlatformIds, exportFileList } from "@/lib/exportPresets";
+import { useCallback, useRef, useState } from "react";
+import BackgroundPanel from "@/components/BackgroundPanel";
+import ExportPanel from "@/components/ExportPanel";
 import ForegroundPanel from "@/components/ForegroundPanel";
 import IconPreview from "@/components/IconPreview";
-import BackgroundPanel from "@/components/BackgroundPanel";
 import ShapePanel from "@/components/ShapePanel";
 import TransformPanel from "@/components/TransformPanel";
-import ExportPanel from "@/components/ExportPanel";
+import type { PlatformId } from "@/lib/exportPresets";
+import { allPlatformIds, exportFileList } from "@/lib/exportPresets";
+import { exportZip } from "@/lib/exportZip";
+import type { IconConfig } from "@/types/icon";
+import { defaultIconConfig } from "@/types/icon";
 
 const MARK_STAGGER_MS = 70;
 
@@ -29,8 +29,8 @@ export default function Home() {
     // filter against the registry so the selection keeps canonical order
     setSelected((prev) =>
       allPlatformIds.filter((p) =>
-        p === id ? !prev.includes(p) : prev.includes(p)
-      )
+        p === id ? !prev.includes(p) : prev.includes(p),
+      ),
     );
   }, []);
 
@@ -66,7 +66,7 @@ export default function Home() {
         index++;
         const delay = Math.max(0, at - (performance.now() - start));
         markTimers.current.push(
-          setTimeout(() => setCompleted((prev) => [...prev, path]), delay)
+          setTimeout(() => setCompleted((prev) => [...prev, path]), delay),
         );
       });
       // let the last checkmarks land before the zip drops
@@ -77,7 +77,7 @@ export default function Home() {
       setSaved(true);
     } catch (err) {
       setExportError(
-        err instanceof Error ? err.message : "export failed. retry."
+        err instanceof Error ? err.message : "export failed. retry.",
       );
     } finally {
       setExporting(false);

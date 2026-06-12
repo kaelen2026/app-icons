@@ -8,7 +8,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ```sh
 pnpm dev        # dev server at localhost:3000
-pnpm lint       # eslint .
+pnpm lint       # eslint . && biome check .
+pnpm format     # biome check --write . (format + safe lint fixes)
 pnpm typecheck  # tsc --noEmit
 pnpm build      # next build
 ```
@@ -20,6 +21,8 @@ There is no automated test suite yet; lint + typecheck + build is the verificati
 ```sh
 pnpm lint && pnpm typecheck && pnpm build
 ```
+
+Git hooks (husky) enforce this on commit: pre-commit runs lint-staged (Biome + ESLint on staged files), commit-msg runs commitlint — commit messages must follow Conventional Commits (`feat: ...`, `fix: ...`, etc.). Formatting is Biome (2-space indent, double quotes), configured in `biome.json`.
 
 ## Project architecture
 

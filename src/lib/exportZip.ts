@@ -30,7 +30,7 @@ ${fileLines}
 export async function exportZip(
   config: IconConfig,
   selected: PlatformId[],
-  onProgress?: (path: string) => void
+  onProgress?: (path: string) => void,
 ): Promise<Blob> {
   const zip = new JSZip();
   const active = platforms.filter((p) => selected.includes(p.id));
@@ -58,8 +58,8 @@ export async function exportZip(
     JSON.stringify(
       { ...rest, hasImage: imageSrc !== null, platforms: selected },
       null,
-      2
-    )
+      2,
+    ),
   );
   onProgress?.("icon-config.json");
 

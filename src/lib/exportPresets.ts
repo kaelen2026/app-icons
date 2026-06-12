@@ -41,7 +41,7 @@ const DENSITIES: [string, number][] = [
 function androidMipmaps(
   name: string,
   baseSize: number,
-  variant: RenderVariant
+  variant: RenderVariant,
 ): PlatformFile[] {
   return DENSITIES.map(([suffix, mult]) => ({
     path: `android/res/mipmap-${suffix}/${name}.png`,
@@ -63,7 +63,7 @@ const iosContentsJson = JSON.stringify(
     info: { author: "xcode", version: 1 },
   },
   null,
-  2
+  2,
 );
 
 const layeredImageJson = JSON.stringify(
@@ -74,7 +74,7 @@ const layeredImageJson = JSON.stringify(
     },
   },
   null,
-  2
+  2,
 );
 
 const icLauncherXml = `<?xml version="1.0" encoding="utf-8"?>
@@ -91,14 +91,34 @@ function webManifest(config: IconConfig): string {
       name,
       short_name: name,
       icons: [
-        { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-        { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-        { src: "/maskable-icon-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
-        { src: "/maskable-icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+        {
+          src: "/icon-192.png",
+          sizes: "192x192",
+          type: "image/png",
+          purpose: "any",
+        },
+        {
+          src: "/icon-512.png",
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "any",
+        },
+        {
+          src: "/maskable-icon-192.png",
+          sizes: "192x192",
+          type: "image/png",
+          purpose: "maskable",
+        },
+        {
+          src: "/maskable-icon-512.png",
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "maskable",
+        },
       ],
     },
     null,
-    2
+    2,
   );
 }
 

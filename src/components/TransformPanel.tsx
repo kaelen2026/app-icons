@@ -52,9 +52,7 @@ export default function TransformPanel({ config, onChange }: Props) {
             min={slider.min}
             max={slider.max}
             value={config[slider.key]}
-            onChange={(e) =>
-              onChange({ [slider.key]: Number(e.target.value) })
-            }
+            onChange={(e) => onChange({ [slider.key]: Number(e.target.value) })}
             className="w-full"
           />
         </label>

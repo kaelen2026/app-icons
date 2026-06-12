@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { ForegroundMode, IconConfig, TextFont } from "@/types/icon";
 import { lucideIconNames, lucideSvgDataUrl, toKebab } from "@/lib/lucide";
+import type { ForegroundMode, IconConfig, TextFont } from "@/types/icon";
 import ImageUploader from "./ImageUploader";
 
 const MODES: { value: ForegroundMode; label: string }[] = [
@@ -64,9 +64,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-[11px] tracking-[0.18em] text-text-faint">
-        fg_mode
-      </h2>
+      <h2 className="text-[11px] tracking-[0.18em] text-text-faint">fg_mode</h2>
       <div className="grid grid-cols-3 gap-px border border-hairline bg-hairline">
         {MODES.map((mode) => {
           const active = config.fgMode === mode.value;
@@ -174,14 +172,19 @@ export default function ForegroundPanel({ config, onChange }: Props) {
                     }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt={toKebab(name)} className="h-4.5 w-4.5" />
+                    <img
+                      src={src}
+                      alt={toKebab(name)}
+                      className="h-4.5 w-4.5"
+                    />
                   </button>
                 );
               })}
             </div>
           )}
           <p className="text-[10px] text-text-faint">
-            selected: <span className="text-accent">{toKebab(config.iconName)}</span>
+            selected:{" "}
+            <span className="text-accent">{toKebab(config.iconName)}</span>
           </p>
         </div>
       )}

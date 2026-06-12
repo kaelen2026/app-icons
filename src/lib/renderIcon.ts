@@ -61,7 +61,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 function traceShapePath(
   ctx: CanvasRenderingContext2D,
   shape: IconShape,
-  size: number
+  size: number,
 ) {
   const half = size / 2;
   ctx.beginPath();
@@ -100,7 +100,7 @@ function traceShapePath(
 function drawBackground(
   ctx: CanvasRenderingContext2D,
   config: IconConfig,
-  size: number
+  size: number,
 ) {
   if (config.bgType === "linear") {
     const gradient = ctx.createLinearGradient(0, 0, size, size);
@@ -117,7 +117,7 @@ function drawBackground(
 function applyTransform(
   ctx: CanvasRenderingContext2D,
   config: IconConfig,
-  size: number
+  size: number,
 ) {
   // offset range -100..100 maps to -size/2..size/2
   const dx = (config.offsetX / 100) * (size / 2);
@@ -130,7 +130,7 @@ function drawImageForeground(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
   config: IconConfig,
-  size: number
+  size: number,
 ) {
   const naturalW = img.naturalWidth || size;
   const naturalH = img.naturalHeight || size;
@@ -157,7 +157,7 @@ const FONT_STACKS: Record<TextFont, string> = {
 function drawTextForeground(
   ctx: CanvasRenderingContext2D,
   config: IconConfig,
-  size: number
+  size: number,
 ) {
   const text = config.text.trim();
   if (!text) return;
@@ -189,7 +189,7 @@ function drawTextForeground(
 async function drawForeground(
   ctx: CanvasRenderingContext2D,
   config: IconConfig,
-  size: number
+  size: number,
 ) {
   if (config.fgMode === "text") {
     drawTextForeground(ctx, config, size);
@@ -220,7 +220,7 @@ export async function drawIcon(
   ctx: CanvasRenderingContext2D,
   config: IconConfig,
   size: number,
-  variant: RenderVariant = "masked"
+  variant: RenderVariant = "masked",
 ): Promise<void> {
   const spec = VARIANTS[variant];
   ctx.clearRect(0, 0, size, size);
@@ -250,7 +250,7 @@ export async function drawIcon(
 export async function renderIconDataUrl(
   config: IconConfig,
   size: number,
-  variant: RenderVariant = "masked"
+  variant: RenderVariant = "masked",
 ): Promise<string> {
   const canvas = document.createElement("canvas");
   canvas.width = size;
@@ -264,7 +264,7 @@ export async function renderIconDataUrl(
 export async function renderIcon(
   config: IconConfig,
   size: number,
-  variant: RenderVariant = "masked"
+  variant: RenderVariant = "masked",
 ): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = size;

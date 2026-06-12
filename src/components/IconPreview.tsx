@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { IconConfig } from "@/types/icon";
 import { drawIcon } from "@/lib/renderIcon";
+import type { IconConfig } from "@/types/icon";
 import PreviewWall from "./PreviewWall";
 
 const LOGICAL_SIZE = 1024;
