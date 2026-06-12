@@ -7,10 +7,12 @@ import {
   platforms,
   sizeForPath,
 } from "@/lib/exportPresets";
+import type { ReadinessCheck, ReadinessReport } from "@/lib/readiness";
 
 type Props = {
   exporting: boolean;
   completed: string[];
+  readiness: ReadinessReport;
   saved: boolean;
   selected: PlatformId[];
   zipName: string;
@@ -52,9 +54,91 @@ function FileRow({
   );
 }
 
+function readinessSummary(report: ReadinessReport) {
+  if (report.status === "ready") {
+    return `ready · ${report.checks.length} checks`;
+  }
+
+  const reviewCount = report.checks.filter(
+    (check) => check.severity !== "pass",
+  ).length;
+  const itemLabel = reviewCount === 1 ? "item needs" : "items need";
+
+  return `${report.status} · ${reviewCount} ${itemLabel} review`;
+}
+
+function readinessSeverityClass(severity: ReadinessCheck["severity"]) {
+  if (severity === "issue") {
+    return "text-red-400";
+  }
+
+  if (severity === "warning") {
+    return "text-amber-400";
+  }
+
+  return "text-accent";
+}
+
+function ReadinessSection({ report }: { report: ReadinessReport }) {
+  const reviewChecks = report.checks.filter(
+    (check) => check.severity !== "pass",
+  );
+  const visibleChecks =
+    reviewChecks.length > 0
+      ? reviewChecks.slice(0, 4)
+      : report.checks.filter((check) => check.severity === "pass").slice(0, 3);
+
+  return (
+    <div className="border-t border-hairline pt-3">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="text-[11px] tracking-[0.18em] text-text-faint">
+          readiness
+        </h2>
+        <p className="text-right text-[11px] text-text-dim">
+          {readinessSummary(report)}
+        </p>
+      </div>
+      <ul className="mt-2 space-y-1.5 text-[11px]">
+        {visibleChecks.map((check) => (
+          <li
+            key={check.id}
+            className="rounded-sm border border-hairline bg-panel-2 px-2 py-1.5"
+          >
+            <div className="flex items-baseline gap-2">
+              <span
+                className={`shrink-0 tabular-nums ${readinessSeverityClass(
+                  check.severity,
+                )}`}
+              >
+                {check.severity}
+              </span>
+              <span className="min-w-0 flex-1 text-text">{check.title}</span>
+            </div>
+            <p className="mt-0.5 text-text-dim">{check.detail}</p>
+            {check.platformIds !== undefined &&
+              check.platformIds.length > 0 && (
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {check.platformIds.map((platformId) => (
+                    <span
+                      key={platformId}
+                      className="border border-hairline px-1 text-text-faint"
+                    >
+                      {platformId}
+                    </span>
+                  ))}
+                </div>
+              )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function ExportPanel({
   exporting,
   completed,
+  readiness,
   saved,
   selected,
   zipName,
@@ -110,6 +194,8 @@ export default function ExportPanel({
           );
         })}
       </ul>
+
+      <ReadinessSection report={readiness} />
 
       <h2 className="border-t border-hairline pt-3 text-[11px] tracking-[0.18em] text-text-faint">
         manifest

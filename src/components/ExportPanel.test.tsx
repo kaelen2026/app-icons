@@ -2,10 +2,61 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import ExportPanel from "@/components/ExportPanel";
+import type { ReadinessReport } from "@/lib/readiness";
+
+const readyReport = {
+  status: "ready",
+  checks: [
+    {
+      id: "platform-selection",
+      severity: "pass",
+      title: "Export targets selected",
+      detail: "All selected platforms are available in the export registry.",
+      platformIds: ["web"],
+    },
+    {
+      id: "registry-export-shape",
+      severity: "pass",
+      title: "Export files are registered",
+      detail:
+        "The export registry has output files for the selected platforms.",
+      platformIds: ["web"],
+    },
+  ],
+} satisfies ReadinessReport;
+
+const warningReport = {
+  status: "warnings",
+  checks: [
+    readyReport.checks[0],
+    {
+      id: "small-text-legibility",
+      severity: "warning",
+      title: "Text may be unreadable at favicon sizes",
+      detail:
+        "Shorten text to three characters or fewer for tiny web favicon exports.",
+      platformIds: ["web"],
+    },
+    readyReport.checks[1],
+  ],
+} satisfies ReadinessReport;
+
+const issueReport = {
+  status: "issues",
+  checks: [
+    {
+      id: "platform-selection",
+      severity: "issue",
+      title: "Select at least one export target",
+      detail: "Choose a platform before exporting the icon package.",
+    },
+  ],
+} satisfies ReadinessReport;
 
 const baseProps = {
   exporting: false,
   completed: [],
+  readiness: readyReport,
   saved: false,
   selected: ["web" as const],
   zipName: "my-app-icons.zip",
@@ -61,5 +112,47 @@ describe("ExportPanel", () => {
     await user.click(screen.getByRole("button", { name: "select all" }));
 
     expect(onSelectAll).toHaveBeenCalledWith(true);
+  });
+
+  it("renders warning readiness without disabling download", async () => {
+    const onDownload = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <ExportPanel
+        {...baseProps}
+        onDownload={onDownload}
+        readiness={warningReport}
+      />,
+    );
+
+    expect(screen.getByText("readiness")).toBeInTheDocument();
+    expect(
+      screen.getByText("warnings · 1 item needs review"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Text may be unreadable at favicon sizes"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("web")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "download .zip" }));
+
+    expect(onDownload).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders issue readiness while empty platform selection disables download", () => {
+    render(
+      <ExportPanel {...baseProps} readiness={issueReport} selected={[]} />,
+    );
+
+    expect(
+      screen.getByText("issues · 1 item needs review"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Select at least one export target"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "download .zip" }),
+    ).toBeDisabled();
   });
 });
