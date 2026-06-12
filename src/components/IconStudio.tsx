@@ -154,14 +154,26 @@ export default function IconStudio({
 
   return (
     <div className="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-hairline px-5">
-        <div className="text-sm text-text">
+      <header className="grid h-12 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b border-hairline px-5">
+        <div className="min-w-0 truncate text-sm text-text">
           app_icons{" "}
           <span className="text-[10px] text-text-faint">
             v0.1 · ios + android + web icon packs
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <label className="flex w-56 items-center gap-3 justify-self-center xl:w-72">
+          <span className="shrink-0 text-[11px] tracking-[0.18em] text-text-faint">
+            app_name
+          </span>
+          <input
+            type="text"
+            value={config.appName}
+            onChange={(e) => update({ appName: e.target.value })}
+            placeholder="my-app"
+            className="min-w-0 flex-1 rounded-sm border border-hairline bg-panel-2 px-3 py-1.5 text-xs text-text outline-none transition-colors focus:border-accent"
+          />
+        </label>
+        <div className="flex items-center justify-end gap-2">
           {importNote && (
             <span
               className={`text-[11px] ${
@@ -219,18 +231,6 @@ export default function IconStudio({
         {/* left: controls */}
         <aside className="border-b border-hairline lg:overflow-y-auto lg:border-b-0 lg:border-r">
           <div className="divide-y divide-hairline">
-            <section className="space-y-2 p-5">
-              <h2 className="text-[11px] tracking-[0.18em] text-text-faint">
-                app_name
-              </h2>
-              <input
-                type="text"
-                value={config.appName}
-                onChange={(e) => update({ appName: e.target.value })}
-                placeholder="my-app"
-                className="w-full rounded-sm border border-hairline bg-panel-2 px-3 py-2 text-xs text-text outline-none transition-colors focus:border-accent"
-              />
-            </section>
             <div className="p-5">
               <ForegroundPanel config={config} onChange={update} />
             </div>
