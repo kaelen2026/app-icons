@@ -241,7 +241,8 @@ function drawEmojiForeground(
   config: IconConfig,
   size: number,
 ) {
-  const emoji = config.emoji.trim();
+  // ?? guards configs created before the emoji field existed (e.g. HMR state)
+  const emoji = (config.emoji ?? "").trim();
   if (!emoji) return;
   const target = (config.scale / 100) * size;
 

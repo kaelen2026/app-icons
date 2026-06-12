@@ -161,7 +161,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
           </div>
           <input
             type="text"
-            value={config.emoji}
+            value={config.emoji ?? ""}
             maxLength={16}
             onChange={(e) => onChange({ emoji: e.target.value })}
             placeholder="or paste any emoji"
