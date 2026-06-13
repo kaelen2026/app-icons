@@ -142,6 +142,57 @@ targets and editing workflows are added.
 - Preserve strictness. Do not loosen `tsconfig`, lint rules, or schema
   validation to make a local change easier.
 
+## TypeScript
+
+- Model domain concepts with narrow unions instead of free-form strings when the
+  set of values is known, such as foreground modes, background types, icon
+  shapes, render variants, and platform IDs.
+- Keep exported types close to the module that owns the behavior. Shared domain
+  types live in `src/types` only when multiple areas need the same contract.
+- Use `type` for object shapes, unions, and function contracts. Use `interface`
+  only when declaration merging or class-style extension is genuinely useful.
+- Prefer `satisfies` for object literals that must conform to an exported
+  contract while preserving literal inference.
+- Use `as const` for fixed registries, tuples, and literal lists when it improves
+  inference without making the data harder to read.
+- Avoid type assertions. If an assertion is unavoidable, keep it local and
+  explain why runtime validation or control-flow narrowing already makes it
+  safe.
+- Do not use non-null assertions (`!`) unless an API or DOM invariant cannot be
+  expressed cleanly. Prefer guards, early returns, or tested helper functions.
+- Use explicit return types for exported functions, hooks, and helpers consumed
+  across module boundaries. Local callbacks can rely on inference when obvious.
+- Use `import type` / `export type` for type-only imports and exports.
+- Prefer discriminated unions for state machines and status objects instead of
+  parallel booleans that can contradict each other.
+- Represent nullable values explicitly with `null` when they are part of app
+  state. Avoid mixing `null` and `undefined` for the same field.
+- Optional object properties should mean "may be absent"; do not use optional
+  properties when callers must always provide the key with an empty value.
+- Use `readonly` arrays and readonly object inputs for pure helpers. Copy before
+  sorting, filtering into mutable accumulators, or normalizing caller-owned
+  values.
+- Keep generics constrained and readable. If a generic only has one call shape
+  or makes errors harder to understand, use a concrete type.
+- Validate `unknown` before narrowing. Trust-boundary parsers should return
+  typed values only after checking shape, value ranges, and allowed literals.
+- Avoid enum runtime output. Prefer literal unions plus const maps unless a
+  runtime enum object is specifically needed.
+- Do not introduce ambient declarations or global type augmentation without an
+  ADR explaining the need.
+- React props should be explicit named types when a component is exported or
+  tested directly. Inline prop types are acceptable for tiny private
+  subcomponents.
+- Event handler types should come from React only when inference is not clear;
+  prefer reading values inside the handler instead of over-generalizing the
+  event type.
+- Keep Zod/schema parser output aligned with TypeScript types. A parser that
+  accepts a value must produce the same shape the rest of the app expects.
+- When using `Record`, make sure the key space is actually total. Use
+  `Partial<Record<...>>` or a `Map` when keys can be missing.
+- Do not silence TypeScript with broad casts such as `as any`, `as never`, or
+  double assertions. Fix the type boundary instead.
+
 ## Scripts And Tooling
 
 - Repository scripts should use Node built-ins first and avoid adding runtime
