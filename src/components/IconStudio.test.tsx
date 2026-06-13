@@ -124,47 +124,53 @@ vi.mock("@/components/IconPreview", () => ({
   ),
 }));
 
-vi.mock("@/components/ExportPanel", () => ({
-  default: ({
-    completed,
-    exporting,
-    onDownload,
-    onSelectAll,
-    onToggle,
-    saved,
-    selected,
-    zipName,
-  }: {
-    completed: string[];
-    exporting: boolean;
-    onDownload: () => void;
-    onSelectAll: (all: boolean) => void;
-    onToggle: (id: PlatformId) => void;
-    saved: boolean;
-    selected: PlatformId[];
-    zipName: string;
-  }) => (
-    <section>
-      <p>exporting {String(exporting)}</p>
-      <p>saved {String(saved)}</p>
-      <p>selected {selected.join(",")}</p>
-      <p>zip {zipName}</p>
-      <p>completed {completed.join(",")}</p>
-      <button type="button" onClick={() => onToggle("web")}>
-        toggle web
-      </button>
-      <button type="button" onClick={() => onSelectAll(false)}>
-        clear platforms
-      </button>
-      <button type="button" onClick={() => onSelectAll(true)}>
-        all platforms
-      </button>
-      <button type="button" onClick={onDownload}>
-        panel download
-      </button>
-    </section>
-  ),
-}));
+vi.mock("@/modules/exporting", async () => {
+  const actual = await vi.importActual<typeof import("@/modules/exporting")>(
+    "@/modules/exporting",
+  );
+  return {
+    ...actual,
+    ExportPanel: ({
+      completed,
+      exporting,
+      onDownload,
+      onSelectAll,
+      onToggle,
+      saved,
+      selected,
+      zipName,
+    }: {
+      completed: string[];
+      exporting: boolean;
+      onDownload: () => void;
+      onSelectAll: (all: boolean) => void;
+      onToggle: (id: PlatformId) => void;
+      saved: boolean;
+      selected: PlatformId[];
+      zipName: string;
+    }) => (
+      <section>
+        <p>exporting {String(exporting)}</p>
+        <p>saved {String(saved)}</p>
+        <p>selected {selected.join(",")}</p>
+        <p>zip {zipName}</p>
+        <p>completed {completed.join(",")}</p>
+        <button type="button" onClick={() => onToggle("web")}>
+          toggle web
+        </button>
+        <button type="button" onClick={() => onSelectAll(false)}>
+          clear platforms
+        </button>
+        <button type="button" onClick={() => onSelectAll(true)}>
+          all platforms
+        </button>
+        <button type="button" onClick={onDownload}>
+          panel download
+        </button>
+      </section>
+    ),
+  };
+});
 
 describe("IconStudio", () => {
   beforeEach(() => {
