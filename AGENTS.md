@@ -17,6 +17,12 @@ pnpm typecheck       # tsc --noEmit
 pnpm build           # next build
 ```
 
+## Branch policy
+
+Before making code or documentation changes, read `docs/gitflow.md`. Do not
+work directly on `main`; create a short-lived `feature/*`, `fix/*`, `docs/*`, or
+`chore/*` branch and open pull requests against `dev`.
+
 ## Verification
 
 The baseline verification gate after code changes is:
