@@ -3,8 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import IconStudio from "@/components/IconStudio";
 import type { PlatformId } from "@/lib/exportPresets";
-import { exportZip } from "@/lib/exportZip";
 import type { SavedDesign } from "@/lib/savedDesigns";
+import { exportZip } from "@/modules/exporting/lib/exportZip";
 import { defaultIconConfig, type IconConfig } from "@/types/icon";
 
 type Change = (patch: Partial<IconConfig>) => void;
@@ -17,9 +17,10 @@ vi.mock("file-saver", () => ({
   saveAs: vi.fn(),
 }));
 
-vi.mock("@/lib/exportZip", async () => {
-  const actual =
-    await vi.importActual<typeof import("@/lib/exportZip")>("@/lib/exportZip");
+vi.mock("@/modules/exporting/lib/exportZip", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/modules/exporting/lib/exportZip")
+  >("@/modules/exporting/lib/exportZip");
   return {
     ...actual,
     exportZip: vi.fn(async (_config, _selected, onProgress) => {
