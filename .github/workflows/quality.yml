@@ -6,6 +6,17 @@ on:
     branches: [main]
 
 jobs:
+  branch-policy:
+    name: Branch Policy
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require PRs to target dev
+        if: github.base_ref != 'dev'
+        run: |
+          echo "Pull requests must target dev. Change this PR base branch to dev."
+          exit 1
+
   verify:
     name: Verify
     runs-on: ubuntu-latest
