@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { useSavedDesigns } from "@/components/useSavedDesigns";
 import { defaultIconConfig } from "@/types/icon";
+import { useSavedDesigns } from "../hooks/useSavedDesigns";
 
 describe("useSavedDesigns", () => {
   beforeEach(() => {

@@ -3,8 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import IconStudio from "@/components/IconStudio";
 import type { PlatformId } from "@/lib/exportPresets";
-import type { SavedDesign } from "@/lib/savedDesigns";
 import { exportZip } from "@/modules/exporting/lib/exportZip";
+import type { SavedDesign } from "@/modules/saved-designs";
 import { defaultIconConfig, type IconConfig } from "@/types/icon";
 
 type Change = (patch: Partial<IconConfig>) => void;
@@ -56,35 +56,41 @@ vi.mock("@/components/VariationPanel", () => ({
   ),
 }));
 
-vi.mock("@/components/SavedDesignsPanel", () => ({
-  default: ({
-    designs,
-    onDelete,
-    onRestore,
-    onSave,
-  }: {
-    designs: SavedDesign[];
-    onDelete: (id: string) => void;
-    onRestore: (design: SavedDesign) => void;
-    onSave: () => void;
-  }) => (
-    <section>
-      <button type="button" onClick={onSave}>
-        save design
-      </button>
-      {designs.map((design) => (
-        <div key={design.id}>
-          <button type="button" onClick={() => onRestore(design)}>
-            restore {design.name}
-          </button>
-          <button type="button" onClick={() => onDelete(design.id)}>
-            delete {design.name}
-          </button>
-        </div>
-      ))}
-    </section>
-  ),
-}));
+vi.mock("@/modules/saved-designs", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/modules/saved-designs")
+  >("@/modules/saved-designs");
+  return {
+    ...actual,
+    SavedDesignsPanel: ({
+      designs,
+      onDelete,
+      onRestore,
+      onSave,
+    }: {
+      designs: SavedDesign[];
+      onDelete: (id: string) => void;
+      onRestore: (design: SavedDesign) => void;
+      onSave: () => void;
+    }) => (
+      <section>
+        <button type="button" onClick={onSave}>
+          save design
+        </button>
+        {designs.map((design) => (
+          <div key={design.id}>
+            <button type="button" onClick={() => onRestore(design)}>
+              restore {design.name}
+            </button>
+            <button type="button" onClick={() => onDelete(design.id)}>
+              delete {design.name}
+            </button>
+          </div>
+        ))}
+      </section>
+    ),
+  };
+});
 
 vi.mock("@/components/ForegroundPanel", () => ({
   default: ({ onChange }: { onChange: Change }) => (

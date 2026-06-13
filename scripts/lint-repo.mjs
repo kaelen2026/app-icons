@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 const textExtensions = new Set([
@@ -34,6 +34,10 @@ const conflictMarkerPattern = /^(<{7}|={7}|>{7})/m;
 const debugLogPattern = /\bconsole\.(log|debug)\s*\(/;
 
 for (const file of trackedFiles) {
+  if (!existsSync(file)) {
+    continue;
+  }
+
   const basename = path.basename(file);
   if (forbiddenBasenames.has(basename)) {
     failures.push(`${file}: remove local system file from version control`);

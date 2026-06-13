@@ -6,12 +6,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BackgroundPanel from "@/components/BackgroundPanel";
 import ForegroundPanel from "@/components/ForegroundPanel";
 import IconPreview from "@/components/IconPreview";
-import SavedDesignsPanel from "@/components/SavedDesignsPanel";
 import ShapePanel from "@/components/ShapePanel";
 import TransformPanel from "@/components/TransformPanel";
 import { useIconConfigHistory } from "@/components/useIconConfigHistory";
 import { useImportConfig } from "@/components/useImportConfig";
-import { useSavedDesigns } from "@/components/useSavedDesigns";
 import VariationPanel from "@/components/VariationPanel";
 import { loadStoredConfig, saveStoredConfig } from "@/lib/configStorage";
 import { randomStylePatch } from "@/lib/presets";
@@ -22,6 +20,7 @@ import {
   type PlatformId,
   useIconExport,
 } from "@/modules/exporting";
+import { SavedDesignsPanel, useSavedDesigns } from "@/modules/saved-designs";
 import type { IconConfig } from "@/types/icon";
 import { defaultIconConfig } from "@/types/icon";
 

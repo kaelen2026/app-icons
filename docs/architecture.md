@@ -55,6 +55,22 @@ registry entry, not branching UI code.
 Legacy `src/lib/*` and `src/components/*` export paths may exist as compatibility
 shims, but new implementation should live inside the owning module.
 
+## Saved Designs
+
+Saved-design persistence and UI are owned by the `src/modules/saved-designs`
+module.
+
+- `src/modules/saved-designs/lib/savedDesigns.ts` owns the localStorage key,
+  trust-boundary parsing, snapshot creation, and maximum saved-design count.
+- `src/modules/saved-designs/hooks/useSavedDesigns.ts` coordinates browser
+  persistence with React state.
+- `src/modules/saved-designs/components/SavedDesignsPanel.tsx` renders the
+  saved-design controls.
+
+Legacy `src/lib/savedDesigns.ts` and `src/components/*` saved-design paths may
+exist as compatibility shims, but new saved-design implementation should live
+inside the module.
+
 ## Design Specs
 
 `docs/superpowers/specs/` holds design specs for larger changes. Use those specs

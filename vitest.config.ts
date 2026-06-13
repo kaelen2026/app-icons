@@ -18,12 +18,12 @@ export default defineConfig({
         "src/lib/lucide.ts",
         "src/lib/presets.ts",
         "src/lib/renderVariants.ts",
-        "src/lib/savedDesigns.ts",
         "src/lib/variations.ts",
         "src/modules/exporting/lib/exportPresets.ts",
         "src/modules/exporting/lib/exportZip.ts",
         "src/modules/exporting/lib/ico.ts",
         "src/modules/exporting/lib/readiness.ts",
+        "src/modules/saved-designs/lib/savedDesigns.ts",
       ],
       exclude: ["src/**/*.test.{ts,tsx}"],
       thresholds: {

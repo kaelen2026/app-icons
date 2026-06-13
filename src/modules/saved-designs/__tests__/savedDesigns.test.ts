@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { defaultIconConfig } from "@/types/icon";
 import {
   createSavedDesign,
   loadSavedDesigns,
   saveSavedDesigns,
-} from "@/lib/savedDesigns";
-import { defaultIconConfig } from "@/types/icon";
+} from "../lib/savedDesigns";
 
 describe("saved designs storage", () => {
   beforeEach(() => {

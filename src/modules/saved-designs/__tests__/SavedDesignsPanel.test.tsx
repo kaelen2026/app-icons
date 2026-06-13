@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import SavedDesignsPanel from "@/components/SavedDesignsPanel";
-import type { SavedDesign } from "@/lib/savedDesigns";
 import { defaultIconConfig } from "@/types/icon";
+import SavedDesignsPanel from "../components/SavedDesignsPanel";
+import type { SavedDesign } from "../lib/savedDesigns";
 
 const savedDesign: SavedDesign = {
   id: "design-1",
