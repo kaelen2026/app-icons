@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { getReadinessReport } from "@/lib/readiness";
 import type { IconConfig } from "@/types/icon";
 import { defaultIconConfig } from "@/types/icon";
+import { getReadinessReport } from "../lib/readiness";
 
 function config(patch: Partial<IconConfig>): IconConfig {
   return { ...defaultIconConfig, ...patch };

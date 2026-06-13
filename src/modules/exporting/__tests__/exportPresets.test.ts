@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { exportFileList, platforms, sizeForPath } from "@/lib/exportPresets";
 import { defaultIconConfig } from "@/types/icon";
+import { exportFileList, platforms, sizeForPath } from "../lib/exportPresets";
 
 describe("export preset registry", () => {
   it("builds ZIP file lists in registry order with metadata files last", () => {

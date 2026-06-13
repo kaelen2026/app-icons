@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import { describe, expect, it, vi } from "vitest";
-import { exportZip, zipFileName } from "@/lib/exportZip";
 import { defaultIconConfig } from "@/types/icon";
+import { exportZip, zipFileName } from "../lib/exportZip";
 
 vi.mock("@/lib/renderIcon", () => ({
   renderIcon: vi.fn(

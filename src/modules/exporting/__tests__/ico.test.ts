@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { encodeIco } from "@/lib/ico";
+import { encodeIco } from "../lib/ico";
 
 function pngBlob(bytes: number[]) {
   return new Blob([new Uint8Array(bytes)], { type: "image/png" });
