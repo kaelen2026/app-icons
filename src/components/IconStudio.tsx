@@ -4,22 +4,24 @@ import { track } from "@vercel/analytics";
 import { saveAs } from "file-saver";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BackgroundPanel from "@/components/BackgroundPanel";
-import ExportPanel from "@/components/ExportPanel";
 import ForegroundPanel from "@/components/ForegroundPanel";
 import IconPreview from "@/components/IconPreview";
 import SavedDesignsPanel from "@/components/SavedDesignsPanel";
 import ShapePanel from "@/components/ShapePanel";
 import TransformPanel from "@/components/TransformPanel";
 import { useIconConfigHistory } from "@/components/useIconConfigHistory";
-import { useIconExport } from "@/components/useIconExport";
 import { useImportConfig } from "@/components/useImportConfig";
 import { useSavedDesigns } from "@/components/useSavedDesigns";
 import VariationPanel from "@/components/VariationPanel";
 import { loadStoredConfig, saveStoredConfig } from "@/lib/configStorage";
-import type { PlatformId } from "@/lib/exportPresets";
-import { allPlatformIds } from "@/lib/exportPresets";
 import { randomStylePatch } from "@/lib/presets";
-import { getReadinessReport } from "@/lib/readiness";
+import {
+  allPlatformIds,
+  ExportPanel,
+  getReadinessReport,
+  type PlatformId,
+  useIconExport,
+} from "@/modules/exporting";
 import type { IconConfig } from "@/types/icon";
 import { defaultIconConfig } from "@/types/icon";
 
