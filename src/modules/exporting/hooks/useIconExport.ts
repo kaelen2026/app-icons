@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { PlatformId } from "@/modules/exporting";
-import {
-  exportZip as defaultExportZip,
-  exportFileList,
-  zipFileName,
-} from "@/modules/exporting";
 import type { IconConfig } from "@/types/icon";
+import type { PlatformId } from "../lib/exportPresets";
+import { exportFileList } from "../lib/exportPresets";
+import { exportZip as defaultExportZip, zipFileName } from "../lib/exportZip";
 
 type ExportZip = typeof defaultExportZip;
 
@@ -18,6 +15,16 @@ type Options = {
   trackExport: (selected: PlatformId[]) => void;
 };
 
+type UseIconExportResult = {
+  completed: string[];
+  download: () => Promise<void>;
+  exportError: string | null;
+  exporting: boolean;
+  resetExportStatus: () => void;
+  saved: boolean;
+  zipName: string;
+};
+
 export function useIconExport({
   config,
   exportZip = defaultExportZip,
@@ -25,7 +32,7 @@ export function useIconExport({
   saveBlob,
   selected,
   trackExport,
-}: Options) {
+}: Options): UseIconExportResult {
   const [exporting, setExporting] = useState(false);
   const [completed, setCompleted] = useState<string[]>([]);
   const [saved, setSaved] = useState(false);

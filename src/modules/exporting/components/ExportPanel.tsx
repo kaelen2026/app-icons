@@ -1,16 +1,13 @@
 "use client";
 
-import type {
-  PlatformId,
-  ReadinessCheck,
-  ReadinessReport,
-} from "@/modules/exporting";
+import type { PlatformId } from "../lib/exportPresets";
 import {
   exportFileList,
   extraExportFiles,
   platforms,
   sizeForPath,
-} from "@/modules/exporting";
+} from "../lib/exportPresets";
+import type { ReadinessCheck, ReadinessReport } from "../lib/readiness";
 
 type Props = {
   exporting: boolean;
