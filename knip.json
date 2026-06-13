@@ -4,6 +4,7 @@
     "src/app/**/*.{ts,tsx}",
     "src/components/**/*.test.tsx",
     "src/lib/**/*.test.ts",
+    "src/modules/**/*.test.{ts,tsx}",
     "e2e/**/*.ts",
     "scripts/*.mjs",
     "*.config.{js,mjs,ts}"
@@ -15,9 +16,19 @@
     "*.config.{js,mjs,ts}"
   ],
   "ignoreIssues": {
-    "src/lib/exportPresets.ts": ["types"],
+    "src/lib/exportPresets.ts": ["exports", "types"],
+    "src/modules/exporting/index.ts": ["exports", "types"],
+    "src/modules/exporting/lib/exportPresets.ts": ["types"],
+    "src/modules/exporting/lib/readiness.ts": ["types"],
     "src/types/icon.ts": ["types"]
   },
+  "ignoreFiles": [
+    "src/components/ExportPanel.tsx",
+    "src/components/useIconExport.ts",
+    "src/lib/exportZip.ts",
+    "src/lib/ico.ts",
+    "src/lib/readiness.ts"
+  ],
   "ignoreDependencies": [
     "@secretlint/secretlint-rule-preset-recommend",
     "tailwindcss"

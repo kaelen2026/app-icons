@@ -12,7 +12,11 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html", "lcov"],
       reportsDirectory: "./coverage/components",
-      include: ["src/components/**/*.{ts,tsx}"],
+      include: [
+        "src/components/**/*.{ts,tsx}",
+        "src/modules/**/components/**/*.{ts,tsx}",
+        "src/modules/**/hooks/**/*.{ts,tsx}",
+      ],
       exclude: ["src/**/*.test.{ts,tsx}"],
       thresholds: {
         statements: 80,
@@ -22,7 +26,7 @@ export default defineConfig({
       },
     },
     environment: "happy-dom",
-    include: ["src/components/**/*.test.tsx"],
+    include: ["src/components/**/*.test.tsx", "src/modules/**/*.test.tsx"],
     setupFiles: ["./vitest.setup.ts"],
   },
 });

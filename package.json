@@ -24,8 +24,8 @@
     "test:watch": "vitest",
     "test:unit": "vitest run src/lib src/modules",
     "test:unit:coverage": "vitest run src/lib src/modules --coverage",
-    "test:component": "vitest run src/components",
-    "test:component:coverage": "vitest run src/components --coverage --config vitest.component.config.ts",
+    "test:component": "vitest run src/components src/modules --config vitest.component.config.ts",
+    "test:component:coverage": "vitest run src/components src/modules --coverage --config vitest.component.config.ts",
     "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
