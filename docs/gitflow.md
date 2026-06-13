@@ -12,3 +12,12 @@ This repository uses a lightweight GitFlow policy:
 
 Do not make feature, fix, documentation, or maintenance changes directly on
 `main`. Use a short-lived branch and open a PR to `dev`.
+
+## Enforcement
+
+- CI fails pull requests that target any branch other than `dev`.
+- The `dev` branch must exist locally and remotely before contributors open
+  pull requests.
+- Direct pushes to `main` cannot be fully blocked by repository files. Configure
+  GitHub branch protection or rulesets for `main` to require pull requests,
+  disallow direct pushes, and require the quality workflow before merge.
