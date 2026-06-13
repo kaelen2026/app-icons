@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import ExportPanel from "@/components/ExportPanel";
-import { platforms } from "@/lib/exportPresets";
-import type { ReadinessCheck, ReadinessReport } from "@/lib/readiness";
+import type { ReadinessCheck, ReadinessReport } from "@/modules/exporting";
+import { platforms } from "@/modules/exporting";
+import ExportPanel from "../components/ExportPanel";
 
 const exportTargetsSelectedCheck = {
   id: "platform-selection",

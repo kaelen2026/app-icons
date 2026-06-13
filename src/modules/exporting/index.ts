@@ -1,3 +1,5 @@
+export { default as ExportPanel } from "./components/ExportPanel";
+export { useIconExport } from "./hooks/useIconExport";
 export type {
   IcoFile,
   Platform,

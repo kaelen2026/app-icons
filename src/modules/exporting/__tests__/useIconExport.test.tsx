@@ -1,8 +1,8 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { useIconExport } from "@/components/useIconExport";
-import type { PlatformId } from "@/lib/exportPresets";
+import type { PlatformId } from "@/modules/exporting";
 import { defaultIconConfig } from "@/types/icon";
+import { useIconExport } from "../hooks/useIconExport";
 
 describe("useIconExport", () => {
   it("tracks completed files and saves the exported blob", async () => {
