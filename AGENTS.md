@@ -23,6 +23,14 @@ Before making code or documentation changes, read `docs/gitflow.md`. Do not
 work directly on `main`; create a short-lived `feature/*`, `fix/*`, `docs/*`, or
 `chore/*` branch and open pull requests against `dev`.
 
+## Agent workflow
+
+Before multi-step implementation or structural refactors, read
+`docs/agent-workflow.md`. The main agent coordinates the flow, coding subagents
+handle scoped implementation tasks, and separate review subagents review the
+result. Do not use the same subagent as both coder and sole reviewer for the same
+task.
+
 ## Verification
 
 The baseline verification gate after code changes is:
