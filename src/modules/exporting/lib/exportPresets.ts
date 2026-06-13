@@ -1,4 +1,4 @@
-import type { RenderVariant } from "@/lib/renderIcon";
+import type { RenderVariant } from "@/lib/renderVariants";
 import type { IconConfig } from "@/types/icon";
 
 export type PlatformId =

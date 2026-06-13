@@ -14,14 +14,16 @@ export default defineConfig({
       reportsDirectory: "./coverage/unit",
       include: [
         "src/lib/configStorage.ts",
-        "src/lib/exportPresets.ts",
         "src/lib/iconConfigSchema.ts",
-        "src/lib/ico.ts",
         "src/lib/lucide.ts",
         "src/lib/presets.ts",
         "src/lib/renderVariants.ts",
         "src/lib/savedDesigns.ts",
         "src/lib/variations.ts",
+        "src/modules/exporting/lib/exportPresets.ts",
+        "src/modules/exporting/lib/exportZip.ts",
+        "src/modules/exporting/lib/ico.ts",
+        "src/modules/exporting/lib/readiness.ts",
       ],
       exclude: ["src/**/*.test.{ts,tsx}"],
       thresholds: {
