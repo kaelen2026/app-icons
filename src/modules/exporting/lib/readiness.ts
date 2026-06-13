@@ -143,13 +143,22 @@ function hasContrastRisk(config: IconConfig): boolean {
   }
 
   const foreground = hexToRgb(foregroundColor);
-  const background = hexToRgb(config.bgColor1);
+  const backgroundColors =
+    config.bgType === "solid"
+      ? [config.bgColor1]
+      : [config.bgColor1, config.bgColor2];
 
-  if (foreground === null || background === null) {
+  if (foreground === null) {
     return false;
   }
 
-  return contrastRatio(foreground, background) < CONTRAST_WARNING_THRESHOLD;
+  return backgroundColors.some((color) => {
+    const background = hexToRgb(color);
+    return (
+      background !== null &&
+      contrastRatio(foreground, background) < CONTRAST_WARNING_THRESHOLD
+    );
+  });
 }
 
 function hexToRgb(hex: string): [number, number, number] | null {

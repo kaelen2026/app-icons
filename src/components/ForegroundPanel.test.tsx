@@ -27,8 +27,11 @@ describe("ForegroundPanel", () => {
       />,
     );
 
-    await user.clear(screen.getByRole("textbox"));
-    await user.type(screen.getByRole("textbox"), "Hi");
+    await user.clear(screen.getByRole("textbox", { name: "text foreground" }));
+    await user.type(
+      screen.getByRole("textbox", { name: "text foreground" }),
+      "Hi",
+    );
     await user.click(screen.getByRole("button", { name: "serif" }));
 
     expect(onChange).toHaveBeenCalledWith({ text: "" });
@@ -42,10 +45,13 @@ describe("ForegroundPanel", () => {
     render(<ForegroundPanel config={defaultIconConfig} onChange={onChange} />);
 
     await user.type(
-      screen.getByPlaceholderText("search 1900+ icons…"),
+      screen.getByRole("textbox", { name: "search icons" }),
       "heart",
     );
     await user.click(screen.getByRole("button", { name: "heart" }));
+    fireEvent.change(screen.getByLabelText("icon color"), {
+      target: { value: "#ffffff" },
+    });
     fireEvent.change(screen.getByRole("slider", { name: /stroke/i }), {
       target: { value: "3" },
     });
@@ -66,9 +72,12 @@ describe("ForegroundPanel", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "⚡" }));
-    fireEvent.change(screen.getByPlaceholderText("or paste any emoji"), {
-      target: { value: "🎨" },
-    });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "emoji foreground" }),
+      {
+        target: { value: "🎨" },
+      },
+    );
 
     expect(onChange).toHaveBeenCalledWith({ emoji: "⚡" });
     expect(onChange).toHaveBeenLastCalledWith({ emoji: "🎨" });

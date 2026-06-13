@@ -121,6 +121,29 @@ describe("getReadinessReport", () => {
     );
   });
 
+  it("checks contrast against both gradient colors", () => {
+    const report = getReadinessReport(
+      config({
+        fgMode: "icon",
+        iconColor: "#ffffff",
+        bgType: "linear",
+        bgColor1: "#000000",
+        bgColor2: "#ffffff",
+      }),
+      ["ios"],
+    );
+
+    expect(report.status).toBe("warnings");
+    expect(report.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "contrast-risk",
+          severity: "warning",
+        }),
+      ]),
+    );
+  });
+
   it("skips contrast warnings for image and emoji foregrounds", () => {
     const imageReport = getReadinessReport(
       config({

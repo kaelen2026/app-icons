@@ -69,6 +69,35 @@ describe("saved designs storage", () => {
     ).toHaveLength(12);
   });
 
+  it("falls back to image-less snapshots when stored images exceed quota", () => {
+    const originalSetItem = localStorage.setItem.bind(localStorage);
+    const setItem = vi
+      .spyOn(window.localStorage, "setItem")
+      .mockImplementation(function setItemWithQuotaFallback(key, value) {
+        if (setItem.mock.calls.length === 1) {
+          throw new DOMException("quota exceeded", "QuotaExceededError");
+        }
+        return originalSetItem(key, value);
+      });
+
+    saveSavedDesigns([
+      createSavedDesign({
+        ...defaultIconConfig,
+        fgMode: "image",
+        imageSrc: "data:image/png;base64,large",
+      }),
+    ]);
+
+    const stored = JSON.parse(
+      localStorage.getItem("app-icons:saved-designs") ?? "[]",
+    );
+    expect(setItem).toHaveBeenCalledTimes(2);
+    expect(stored[0].config).toMatchObject({
+      fgMode: "image",
+      imageSrc: null,
+    });
+  });
+
   it("returns an empty list for malformed storage", () => {
     localStorage.setItem("app-icons:saved-designs", "{");
 
