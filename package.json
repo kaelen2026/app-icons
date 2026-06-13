@@ -13,6 +13,7 @@
     "lint:secrets": "secretlint \"**/*\"",
     "lint:dead-code": "knip",
     "quality": "pnpm test:coverage && pnpm lint && pnpm lint:dead-code && pnpm typecheck && pnpm build",
+    "release": "node scripts/release.mjs",
     "audit:deps": "pnpm audit --audit-level moderate",
     "deps:outdated": "pnpm outdated",
     "format": "biome check --write .",
