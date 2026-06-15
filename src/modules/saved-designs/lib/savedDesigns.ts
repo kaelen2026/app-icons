@@ -48,13 +48,18 @@ export function loadSavedDesigns(): SavedDesign[] {
 }
 
 export function saveSavedDesigns(designs: SavedDesign[]): void {
+  const cappedDesigns = designs.slice(0, MAX_SAVED_DESIGNS);
   try {
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(designs.slice(0, MAX_SAVED_DESIGNS)),
-    );
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cappedDesigns));
   } catch {
-    // Saved designs are convenience state; failure should never block editing.
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(stripImageSources(cappedDesigns)),
+      );
+    } catch {
+      // Saved designs are convenience state; failure should never block editing.
+    }
   }
 }
 
@@ -65,4 +70,11 @@ export function createSavedDesign(config: IconConfig): SavedDesign {
     createdAt: Date.now(),
     config,
   };
+}
+
+function stripImageSources(designs: SavedDesign[]): SavedDesign[] {
+  return designs.map((design) => ({
+    ...design,
+    config: { ...design.config, imageSrc: null },
+  }));
 }

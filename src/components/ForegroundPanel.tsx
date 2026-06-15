@@ -102,6 +102,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
         <div className="space-y-3">
           <input
             type="text"
+            aria-label="text foreground"
             value={config.text}
             maxLength={12}
             onChange={(e) => onChange({ text: e.target.value })}
@@ -161,6 +162,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
           </div>
           <input
             type="text"
+            aria-label="emoji foreground"
             value={config.emoji ?? ""}
             maxLength={16}
             onChange={(e) => onChange({ emoji: e.target.value })}
@@ -178,6 +180,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
           <div className="flex items-center gap-3">
             <input
               type="text"
+              aria-label="search icons"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="search 1900+ icons…"
@@ -185,6 +188,7 @@ export default function ForegroundPanel({ config, onChange }: Props) {
             />
             <input
               type="color"
+              aria-label="icon color"
               value={config.iconColor}
               onChange={(e) => onChange({ iconColor: e.target.value })}
               className="h-11 w-11 shrink-0 sm:h-7 sm:w-7"
