@@ -11,11 +11,21 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Require PRs to target dev
-        if: github.base_ref != 'dev'
+      - name: Enforce gitflow branch targets
+        env:
+          # Bound to env (not inlined) so branch names can't inject shell.
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
         run: |
-          echo "Pull requests must target dev. Change this PR base branch to dev."
-          exit 1
+          if [ "$BASE" = "dev" ]; then
+            echo "OK: PR targets dev (head=$HEAD)."
+          elif [ "$BASE" = "main" ] && [ "$HEAD" = "dev" ]; then
+            echo "OK: dev -> main promotion."
+          else
+            echo "Disallowed PR target (base=$BASE, head=$HEAD)."
+            echo "feature/fix/docs/chore branches must PR into dev; only dev may PR into main."
+            exit 1
+          fi
 
   verify:
     name: Verify
