@@ -52,8 +52,9 @@ The export panel UI, file-list preview, README content, and ZIP contents all
 derive from the registry. Adding an export target should usually mean adding a
 registry entry, not branching UI code.
 
-Legacy `src/lib/*` and `src/components/*` export paths may exist as compatibility
-shims, but new implementation should live inside the owning module.
+The export implementation lives solely inside this module; import it through the
+`@/modules/exporting` barrel. The former `src/lib/*` and `src/components/*`
+compatibility shims have been removed.
 
 ## Saved Designs
 
@@ -67,9 +68,9 @@ module.
 - `src/modules/saved-designs/components/SavedDesignsPanel.tsx` renders the
   saved-design controls.
 
-Legacy `src/lib/savedDesigns.ts` and `src/components/*` saved-design paths may
-exist as compatibility shims, but new saved-design implementation should live
-inside the module.
+The saved-design implementation lives solely inside this module; import it
+through the `@/modules/saved-designs` barrel. The former `src/lib/savedDesigns.ts`
+and `src/components/*` compatibility shims have been removed.
 
 ## Design Specs
 
