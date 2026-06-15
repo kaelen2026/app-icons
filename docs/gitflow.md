@@ -15,9 +15,17 @@ Do not make feature, fix, documentation, or maintenance changes directly on
 
 ## Enforcement
 
-- CI fails pull requests that target any branch other than `dev`.
-- The `dev` branch must exist locally and remotely before contributors open
-  pull requests.
-- Direct pushes to `main` cannot be fully blocked by repository files. Configure
-  GitHub branch protection or rulesets for `main` to require pull requests,
-  disallow direct pushes, and require the quality workflow before merge.
+The `Branch Policy` job in `.github/workflows/quality.yml` enforces the targets:
+pull requests may target `dev` from any branch, and may target `main` only from
+`dev`; any other target fails.
+
+Both `dev` and `main` have GitHub branch protection enabled:
+
+- Direct pushes are blocked (including for admins); all changes land via pull
+  request.
+- `Verify`, `Coverage`, and `Branch Policy` must pass before merge.
+- Force pushes and branch deletion are disabled.
+
+Because `Branch Policy` is a required check on `main`, the only pull request that
+can merge into `main` is a `dev` -> `main` promotion. Prefer a rebase merge for
+that promotion so `main` stays a fast-forward of `dev`.
