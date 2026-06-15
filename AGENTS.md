@@ -20,8 +20,18 @@ See `docs/quality.md` for the full verification command list.
 ## Required Reading
 
 Before making code or documentation changes, read `docs/gitflow.md`. Do not
-work directly on `main`; create a short-lived `feature/*`, `fix/*`, `docs/*`, or
-`chore/*` branch and open pull requests against `dev`.
+work directly on `main` or `dev`; both are protected and reject direct pushes
+(including from admins).
+
+The PR flow is enforced by branch protection and the `Branch Policy` CI check:
+
+- Create a short-lived `feature/*`, `fix/*`, `docs/*`, or `chore/*` branch and
+  open a pull request against `dev`.
+- `main` is updated only by a `dev` -> `main` promotion pull request; any other
+  branch targeting `main` is rejected.
+- `Verify`, `Coverage`, and `Branch Policy` must pass before any merge. No
+  review approval is required, so you may merge your own PR once checks are
+  green; prefer a rebase merge.
 
 Before multi-step implementation or structural refactors, read
 `docs/agent-workflow.md`. The main agent coordinates the flow, coding subagents
