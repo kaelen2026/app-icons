@@ -1,5 +1,5 @@
+import type { PlatformId } from "@/modules/exporting";
 import type { IconConfig } from "@/types/icon";
-import type { PlatformId } from "./exportPresets";
 import {
   parseIconConfigWithSchema,
   parsePlatformIdsWithSchema,

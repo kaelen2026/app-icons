@@ -1,7 +1,7 @@
 import { z } from "zod";
+import type { PlatformId } from "@/modules/exporting";
+import { allPlatformIds } from "@/modules/exporting";
 import { defaultIconConfig, type IconConfig } from "@/types/icon";
-import type { PlatformId } from "./exportPresets";
-import { allPlatformIds } from "./exportPresets";
 import { lucideIconNames } from "./lucide";
 
 function hexColor(fallback: string) {
