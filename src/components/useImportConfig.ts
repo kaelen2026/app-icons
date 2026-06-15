@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { parseIconConfig, parsePlatformIds } from "@/lib/configStorage";
-import type { PlatformId } from "@/lib/exportPresets";
+import type { PlatformId } from "@/modules/exporting";
 import type { IconConfig } from "@/types/icon";
 
 type ImportNote = {

@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import IconStudio from "@/components/IconStudio";
-import type { PlatformId } from "@/lib/exportPresets";
+import type { PlatformId } from "@/modules/exporting";
 import { exportZip } from "@/modules/exporting/lib/exportZip";
 import type { SavedDesign } from "@/modules/saved-designs";
 import { defaultIconConfig, type IconConfig } from "@/types/icon";
