@@ -1,6 +1,6 @@
 import { z } from "zod";
-import type { PlatformId } from "@/modules/exporting";
-import { allPlatformIds } from "@/modules/exporting";
+import type { PlatformId } from "@/modules/exporting/lib/exportPresets";
+import { allPlatformIds } from "@/modules/exporting/lib/exportPresets";
 import { defaultIconConfig, type IconConfig } from "@/types/icon";
 import { lucideIconNames } from "./lucide";
 

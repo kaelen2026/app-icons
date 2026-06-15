@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { PlatformId } from "@/modules/exporting";
+import type { PlatformId } from "@/modules/exporting/lib/exportPresets";
 
 // The editor is pure client state (canvas + localStorage). Skipping SSR lets
 // IconStudio read the stored design in its useState initializer, so the saved

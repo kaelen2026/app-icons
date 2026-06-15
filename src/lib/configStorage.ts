@@ -1,4 +1,4 @@
-import type { PlatformId } from "@/modules/exporting";
+import type { PlatformId } from "@/modules/exporting/lib/exportPresets";
 import type { IconConfig } from "@/types/icon";
 import {
   parseIconConfigWithSchema,

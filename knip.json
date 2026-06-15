@@ -16,23 +16,12 @@
     "*.config.{js,mjs,ts}"
   ],
   "ignoreIssues": {
-    "src/lib/exportPresets.ts": ["exports", "types"],
     "src/modules/exporting/index.ts": ["exports", "types"],
     "src/modules/exporting/lib/exportPresets.ts": ["types"],
     "src/modules/exporting/lib/readiness.ts": ["types"],
     "src/modules/saved-designs/index.ts": ["exports", "types"],
     "src/types/icon.ts": ["types"]
   },
-  "ignoreFiles": [
-    "src/components/ExportPanel.tsx",
-    "src/components/SavedDesignsPanel.tsx",
-    "src/components/useIconExport.ts",
-    "src/components/useSavedDesigns.ts",
-    "src/lib/exportZip.ts",
-    "src/lib/ico.ts",
-    "src/lib/readiness.ts",
-    "src/lib/savedDesigns.ts"
-  ],
   "ignoreDependencies": [
     "@secretlint/secretlint-rule-preset-recommend",
     "tailwindcss"

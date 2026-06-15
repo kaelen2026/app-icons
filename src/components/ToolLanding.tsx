@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { LandingPage } from "@/lib/landingPages";
 import { landingPages } from "@/lib/landingPages";
 import { siteName, siteUrl } from "@/lib/site";
-import { platforms } from "@/modules/exporting";
+import { platforms } from "@/modules/exporting/lib/exportPresets";
 
 // Server-rendered copy for a keyword landing page. The exported-files table
 // derives from the exportPresets registry, so it stays truthful and gives

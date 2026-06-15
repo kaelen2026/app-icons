@@ -1,4 +1,4 @@
-import type { PlatformId } from "@/modules/exporting";
+import type { PlatformId } from "@/modules/exporting/lib/exportPresets";
 
 // Keyword landing pages. Each renders the same studio with that platform
 // preselected plus page-specific server copy — sizes tables derive from
